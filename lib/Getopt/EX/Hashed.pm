@@ -1,5 +1,7 @@
 package Getopt::EX::Hashed;
 
+our $VERSION = '0.01';
+
 =head1 NAME
 
 Getopt::EX::Hashed - Hash store object automation
