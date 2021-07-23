@@ -1,0 +1,34 @@
+package App::Foo;
+use strict;
+use warnings;
+use Data::Dumper;
+
+use Getopt::EX::Hashed;
+
+has string   => ( spec => '=s' );
+has say      => ( spec => '=s', default => "Hello" );
+has number   => ( spec => '=i' );
+has implicit => ( spec => ':42' );
+has list     => ( spec => '=s@' );
+has hash     => ( spec => '=s%' );
+
+has [ qw( left right both ) ] => ( spec => '=i' );
+has '+both' => default => sub {
+    $_->{left} = $_->{right} = $_[1];
+};
+
+has ARGV => default => [];
+has '<>' => default => sub {
+    push @{$_->{ARGV}}, $_[0];
+};
+
+no Getopt::EX::Hashed;
+
+sub run {
+    my $app = shift;
+    local @ARGV = @_;
+    use Getopt::Long;
+    $app->getopt or die;
+}
+
+1;
