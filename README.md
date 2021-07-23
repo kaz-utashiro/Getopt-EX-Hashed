@@ -92,32 +92,19 @@ Following parameters are available.
     Set default value.  If no default is given, the member is initialized
     as `undef`.
 
-    Code reference can be specified, but if you want to access hash object
-    in the code, use next **action** parameter.
-
-- **action** => _coderef_
-
-    Because hash object does not exist at the time of declaration, it is
-    impossible to access it.  So **action** parameter takes a code
-    reference to receive the object and produce new code reference.
+    If the value is code reference, hash object is passed by `$_`.
 
         has [ qw(left right both) ] => spec => '=i';
-        has "+both" => action => sub {
-            my $obj = shift;
-            sub {
-                $obj->{left} = $obj->{right} = $_[1];
-            }
+        has "+both" => default => sub {
+            $_->{left} = $_->{right} = $_[1];
         } ;
 
-    This function is called at the time of `new`.  You can use this for
-    `"<>"` too.
+    You can use this for `"<>"` too, and spec parameter is not
+    required in this case.
 
         has ARGV => default => [];
-        has "<>" => spec => '', action => sub {
-            my $obj = shift;
-            sub {
-                push @{$obj->{ARGV}}, $_[0];
-            };
+        has "<>" => default => sub {
+            push @{$_->{ARGV}}, $_[0];
         };
 
 # METHOD

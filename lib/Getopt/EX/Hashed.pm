@@ -97,32 +97,19 @@ There is no difference with ones in B<spec> parameter.
 Set default value.  If no default is given, the member is initialized
 as C<undef>.
 
-Code reference can be specified, but if you want to access hash object
-in the code, use next B<action> parameter.
-
-=item B<action> => I<coderef>
-
-Because hash object does not exist at the time of declaration, it is
-impossible to access it.  So B<action> parameter takes a code
-reference to receive the object and produce new code reference.
+If the value is code reference, hash object is passed by C<$_>.
 
     has [ qw(left right both) ] => spec => '=i';
-    has "+both" => action => sub {
-        my $obj = shift;
-        sub {
-            $obj->{left} = $obj->{right} = $_[1];
-        }
+    has "+both" => default => sub {
+        $_->{left} = $_->{right} = $_[1];
     } ;
 
-This function is called at the time of C<new>.  You can use this for
-C<< "<>" >> too.
+You can use this for C<< "<>" >> too, and spec parameter is not
+required in this case.
 
     has ARGV => default => [];
-    has "<>" => spec => '', action => sub {
-        my $obj = shift;
-        sub {
-            push @{$obj->{ARGV}}, $_[0];
-        };
+    has "<>" => default => sub {
+        push @{$_->{ARGV}}, $_[0];
     };
 
 =back
@@ -254,8 +241,10 @@ sub new {
     for my $key (keys %{$member}) {
 	my $m = $member->{$key};
 	$obj->{$key} = do {
-	    if (my $action = $m->{action}) {
-		_do_action($obj, $action);
+	    if (ref($m->{default}//'') eq 'CODE') {
+		sub {
+		    &{$m->{default}} for $obj;
+		};
 	    } else {
 		$m->{default};
 	    }
@@ -263,16 +252,6 @@ sub new {
     }
     lock_keys %{$obj} if $Config{LOCK_KEYS};
     $obj;
-}
-
-sub _do_action {
-    my($obj, $action) = @_;
-    ref $action eq 'CODE'
-	or die "action must be coderef.\n";
-    my $sub = $action->($obj);
-    ref $sub eq 'CODE'
-	or die "action must return coderef.\n";
-    $sub;
 }
 
 sub optspec {
@@ -298,6 +277,8 @@ my $spec_re = qr/[!+=:]/;
 sub _optspec {
     my $obj = shift;
     my($name, $args) = @_;
+
+    return $name if $name eq '<>';
 
     my @args = split ' ', $args;
     my @spec = grep /$spec_re/, @args;
