@@ -259,7 +259,7 @@ sub optspec {
     my $member = $obj->{__Member__};
     map  { _optspec($obj, @$_) }
     map  {
-	if (my $alias = $member->{$_->[0]}) {
+	if (my $alias = $member->{$_->[0]}->{alias}) {
 	    $_->[1] .= " $alias";
 	}
 	$_;
