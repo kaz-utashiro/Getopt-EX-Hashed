@@ -21,8 +21,12 @@ my @argv = qw(
     Everything
     );
 
+BEGIN {
+    $App::Foo::TAKE_IT_ALL = 0;
+}
+
 use App::Foo;
-(my $app = App::Foo->new)->run(@argv);
+@argv = (my $app = App::Foo->new)->run(@argv);
 
 is_deeply($app->{string}, "Alice", "String");
 is_deeply($app->{say}, "Hello", "String (default)");
@@ -35,6 +39,10 @@ is_deeply($app->{so_long}, 1, "convert underscore");
 is_deeply($app->{list}, [ qw(mostly harmless) ], "List");
 is_deeply($app->{hash}, { animal => 'dolphin', fish => 'babel' }, "Hash");
 is_deeply($app->{left}, 99, "action");
-is_deeply($app->{ARGV}, [ qw(Life Universe and Everything) ], '<>');
+if ($App::Foo::TAKE_IT_ALL) {
+    is_deeply($app->{ARGV}, [ qw(Life Universe and Everything) ], '<>');
+} else {
+    is_deeply(\@argv, [ qw(Life Universe and Everything) ], '@argv');
+}
 
 done_testing;

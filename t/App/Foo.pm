@@ -1,4 +1,5 @@
 package App::Foo;
+
 use strict;
 use warnings;
 use Data::Dumper;
@@ -21,10 +22,12 @@ has '+both' => default => sub {
     $_->{left} = $_->{right} = $_[1];
 };
 
-has ARGV => default => [];
-has '<>' => default => sub {
-    push @{$_->{ARGV}}, $_[0];
-};
+if (our $TAKE_IT_ALL) {
+    has ARGV => default => [];
+    has '<>' => default => sub {
+	push @{$_->{ARGV}}, $_[0];
+    };
+}
 
 no Getopt::EX::Hashed;
 
@@ -33,6 +36,7 @@ sub run {
     local @ARGV = @_;
     use Getopt::Long;
     $app->getopt or die;
+    return @ARGV;
 }
 
 1;
