@@ -22,7 +22,7 @@ my @argv = qw(
     );
 
 BEGIN {
-    $App::Foo::TAKE_IT_ALL = 0;
+    $App::Foo::TAKE_IT_ALL = 1;
 }
 
 use App::Foo;

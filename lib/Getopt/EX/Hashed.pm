@@ -191,6 +191,7 @@ use Data::Dumper;
 use Exporter 'import';
 our @EXPORT = qw(has new);
 
+my @Member;
 my %Member;
 
 my %Config = (
@@ -215,7 +216,7 @@ sub unimport {
 }
 
 sub reset {
-    %Member = ();
+    @Member = %Member = ();
     return $_[0];
 }
 
@@ -224,9 +225,10 @@ sub has {
     my @name = ref $name eq 'ARRAY' ? @$name : $name;
     for (@name) {
 	if (s/^\+//) {
-	    $Member{$_} //= {};
+	    exists $Member{$_} or die "$_: not exists\n";
 	    $Member{$_} = { %{$Member{$_}}, %param };
 	} else {
+	    push @Member, $_ if not exists $Member{$_};
 	    $Member{$_} = \%param;
 	}
     }
@@ -235,10 +237,10 @@ sub has {
 sub new {
     my $class = shift;
     my $obj = bless {}, __PACKAGE__;
-    my $member = $obj->{__Member__} = { %Member };
-    %Member = ();
+    my $member = $obj->{__Hash__} = { %Member };
+    my $order = $obj->{__Order__} = [ @Member ];
     our @ISA = $class;
-    for my $key (keys %{$member}) {
+    for my $key (@{$order}) {
 	my $m = $member->{$key};
 	$obj->{$key} = do {
 	    if (ref($m->{default}//'') eq 'CODE') {
@@ -251,25 +253,28 @@ sub new {
 	};
     }
     lock_keys %{$obj} if $Config{LOCK_KEYS};
+    @Member = %Member = ();
     $obj;
 }
 
 sub optspec {
     my $obj = shift;
-    my $member = $obj->{__Member__};
-    map  { _optspec($obj, @$_) }
-    map  {
-	if (my $alias = $member->{$_->[0]}->{alias}) {
-	    $_->[1] .= " $alias";
+    my $member = $obj->{__Hash__};
+    do {
+	map  { _optspec($obj, @$_) }
+	map  {
+	    if (my $alias = $member->{$_->[0]}->{alias}) {
+		$_->[1] .= " $alias";
+	    }
+	    $_;
 	}
-	$_;
-    }
-    grep {
-	$_->[0] eq '<>' and $_->[1] //= '';
-	defined $_->[1];
-    }
-    map  { [ $_ => $member->{$_}->{spec} ] }
-    reverse sort keys %{$member};
+	grep {
+	    $_->[0] eq '<>' and $_->[1] //= '';
+	    defined $_->[1];
+	}
+	map  { [ $_ => $member->{$_}->{spec} ] }
+	@{$obj->{__Order__}};
+    };
 }
 
 my $spec_re = qr/[!+=:]/;
