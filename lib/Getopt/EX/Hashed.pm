@@ -269,7 +269,7 @@ sub optspec {
 	defined $_->[1];
     }
     map  { [ $_ => $member->{$_}->{spec} ] }
-    keys %{$member};
+    reverse sort keys %{$member};
 }
 
 my $spec_re = qr/[!+=:]/;
