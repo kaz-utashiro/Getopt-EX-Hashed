@@ -227,7 +227,7 @@ sub has {
 	my $append = s/^\+//;
 	if ($append) {
 	    $Member{$_} or die "$_: Not defined\n";
-	    $Member{$_} = { %{$Member{$_}//{}}, %param };
+	    $Member{$_} = { %{$Member{$_}}, %param };
 	} else {
 	    $Member{$_} and die "$_: Duplicated\n";
 	    push @Member, $_;
