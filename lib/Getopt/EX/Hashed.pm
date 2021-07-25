@@ -224,11 +224,13 @@ sub has {
     my($name, %param) = @_;
     my @name = ref $name eq 'ARRAY' ? @$name : $name;
     for (@name) {
-	if (s/^\+//) {
-	    exists $Member{$_} or die "$_: not exists\n";
-	    $Member{$_} = { %{$Member{$_}}, %param };
+	my $append = s/^\+//;
+	if ($append) {
+	    $Member{$_} or die "$_: Not defined\n";
+	    $Member{$_} = { %{$Member{$_}//{}}, %param };
 	} else {
-	    push @Member, $_ if not exists $Member{$_};
+	    $Member{$_} and die "$_: Duplicated\n";
+	    push @Member, $_;
 	    $Member{$_} = \%param;
 	}
     }

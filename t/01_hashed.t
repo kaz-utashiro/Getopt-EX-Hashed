@@ -38,7 +38,7 @@ is_deeply($app->{zaphord}, 1, "alias (separate)");
 is_deeply($app->{so_long}, 1, "convert underscore");
 is_deeply($app->{list}, [ qw(mostly harmless) ], "List");
 is_deeply($app->{hash}, { animal => 'dolphin', fish => 'babel' }, "Hash");
-is_deeply($app->{left}, 99, "action");
+is_deeply($app->{left}, 99, "coderef");
 if ($App::Foo::TAKE_IT_ALL) {
     is_deeply($app->{ARGV}, [ qw(Life Universe and Everything) ], '<>');
 } else {

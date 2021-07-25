@@ -17,10 +17,16 @@ has so_long  => ( spec => '' );
 has list     => ( spec => '=s@' );
 has hash     => ( spec => '=s%' );
 
+# imcremental coderef
 has [ qw( left right both ) ] => ( spec => '=i' );
 has '+both' => default => sub {
     $_->{left} = $_->{right} = $_[1];
 };
+
+# erroneous incremental usage: live or die?
+if (our $WRONG_INCREMENTAL) {
+    has '+no_no_no' => default => 1;
+}
 
 if (our $TAKE_IT_ALL) {
     has ARGV => default => [];
