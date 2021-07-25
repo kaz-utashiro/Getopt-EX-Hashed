@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.01';
+our $VERSION = '0.99';
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 DESCRIPTION
 
-B<Getopt::EX::Hashed> is an module to automate a hash object to store
+B<Getopt::EX::Hashed> is a module to automate a hash object to store
 command line option values.  Major objective of this module is to
 integrate initialization and specification into single place.  Module
 name shares B<Getopt::EX>, but it works independently from other
@@ -85,7 +85,7 @@ will be compiled into:
     a_to_z|a-to-z:s
 
 If nothing special is necessary, give empty (or white space only)
-string as a value.  Otherwise, it is not concidered as an option.
+string as a value.  Otherwise, it is not considered as an option.
 
 =item B<alias> => I<string>
 
