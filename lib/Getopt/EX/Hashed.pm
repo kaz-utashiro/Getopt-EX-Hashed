@@ -302,7 +302,7 @@ sub _optspec {
 	    push @names, tr[_][-]r if /_/;
 	}
     }
-    push @names, '' if @names and $spec !~ /^$spec_re/;
+    push @names, '' if @names and $spec !~ /^($spec_re|$)/;
     join('|', @names) . $spec;
 }
 
