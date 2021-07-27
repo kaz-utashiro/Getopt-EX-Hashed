@@ -17,6 +17,7 @@ Getopt::EX::Hashed - Hash store object automation
 
     sub run {
         my $app = shift;
+        use Getopt::Long;
         $app->getopt or pod2usage();
         if ($app->{start}) {
             ...

@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.99';
+our $VERSION = '0.9901';
 
 =head1 NAME
 
@@ -20,6 +20,7 @@ Getopt::EX::Hashed - Hash store object automation
 
   sub run {
       my $app = shift;
+      use Getopt::Long;
       $app->getopt or pod2usage();
       if ($app->{start}) {
           ...
@@ -301,6 +302,7 @@ sub _optspec {
 	    push @names, tr[_][-]r if /_/;
 	}
     }
+    push @names, '' if @names and $spec !~ /^$spec_re/;
     join('|', @names) . $spec;
 }
 

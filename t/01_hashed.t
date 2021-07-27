@@ -15,6 +15,7 @@ my @argv = qw(
     --implicit
     -s -42
     --end 999
+    --trillian=mcmillan
     --beeblebrox
     --so-long
     --both 99
@@ -34,6 +35,7 @@ is_deeply($app->{number}, 42, "Number");
 is_deeply($app->{implicit}, 42, "Default parameter");
 is_deeply($app->{start}, -42, "alias (short)");
 is_deeply($app->{finish}, 999, "alias (long)");
+is_deeply($app->{tricia}, "mcmillan", "alias (mixed with spec)");
 is_deeply($app->{zaphord}, 1, "alias (separate)");
 is_deeply($app->{so_long}, 1, "convert underscore");
 is_deeply($app->{list}, [ qw(mostly harmless) ], "List");

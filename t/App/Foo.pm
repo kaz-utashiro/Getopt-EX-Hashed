@@ -12,6 +12,7 @@ has number   => ( spec => '=i' );
 has implicit => ( spec => ':42' );
 has start    => ( spec => '=i s begin' );
 has finish   => ( spec => '=i f end' );
+has tricia   => ( spec => 'trillian=s' );
 has zaphord  => ( spec => '', alias => 'beeblebrox' );
 has so_long  => ( spec => '' );
 has list     => ( spec => '=s@' );
