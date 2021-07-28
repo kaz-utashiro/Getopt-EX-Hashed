@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9901';
+our $VERSION = '0.9902';
 
 =head1 NAME
 
@@ -72,7 +72,7 @@ will be compiled into string:
     start|s|begin:i
 
 which conform to C<Getopt::Long> definition.  Of course, you can write
-this as this:
+as this:
 
     has start => ( spec => "s|begin=i" );
 
@@ -162,7 +162,7 @@ If you want to access arbitrary keys, unlock the object.
 
 L<Getopt::Long>
 
-L<Getopt::EX>
+L<Getopt::EX>, L<Getopt::EX::Long>
 
 =head1 AUTHOR
 

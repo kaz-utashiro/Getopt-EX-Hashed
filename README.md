@@ -67,7 +67,7 @@ Following parameters are available.
         start|s|begin:i
 
     which conform to `Getopt::Long` definition.  Of course, you can write
-    this as this:
+    as this:
 
         has start => ( spec => "s|begin=i" );
 
@@ -151,7 +151,7 @@ Following parameters are available.
 
 [Getopt::Long](https://metacpan.org/pod/Getopt::Long)
 
-[Getopt::EX](https://metacpan.org/pod/Getopt::EX)
+[Getopt::EX](https://metacpan.org/pod/Getopt::EX), [Getopt::EX::Long](https://metacpan.org/pod/Getopt::EX::Long)
 
 # AUTHOR
 
