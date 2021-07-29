@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9902';
+our $VERSION = '0.9903';
 
 =head1 NAME
 
@@ -242,7 +242,7 @@ sub new {
     my $obj = bless {}, __PACKAGE__;
     my $member = $obj->{__Hash__} = { %Member };
     my $order = $obj->{__Order__} = [ @Member ];
-    our @ISA = $class;
+    our @ISA = $class if $class ne __PACKAGE__;
     for my $key (@{$order}) {
 	my $m = $member->{$key};
 	$obj->{$key} = do {
