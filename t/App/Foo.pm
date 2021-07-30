@@ -34,6 +34,7 @@ if (our $WRONG_INCREMENTAL) {
     has '+no_no_no' => default => 1;
 }
 
+# erroneous default/action co-exist
 if (our $DEFAULT_AND_ACTION) {
     has default_action =>
 	spec => '=s',

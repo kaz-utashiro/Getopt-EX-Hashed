@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9903';
+our $VERSION = '0.9904';
 
 =head1 NAME
 
