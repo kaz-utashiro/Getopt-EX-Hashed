@@ -32,10 +32,10 @@ Version 0.9905
 =head1 DESCRIPTION
 
 B<Getopt::EX::Hashed> is a module to automate a hash object to store
-command line option values.  Major objective of this module is to
-integrate initialization and specification into single place.  Module
-name shares B<Getopt::EX>, but it works independently from other
-modules included in B<Getopt::EX>, so far.
+command line option values.  Major objective of this module is
+integrating initialization and specification into single place.
+Module name shares B<Getopt::EX>, but it works independently from
+other modules included in B<Getopt::EX>, so far.
 
 In the current implementation, using B<Getopt::Long>, or compatible
 module such as B<Getopt::EX::Long> is assumed.  It is configurable,
@@ -51,7 +51,7 @@ Declare option parameters in a form of:
 
 If array reference is given, multiple names can be declared at once.
 
-    has [ 'left', 'right' ] => ( param => value, ... );
+    has [ 'left', 'right' ] => ( spec => "=i" );
 
 If the name start with plus (C<+>), given parameters are added to
 current value.
@@ -73,7 +73,7 @@ Declaration
 
 will be compiled into string:
 
-    start|s|begin:i
+    start|s|begin=i
 
 which conform to C<Getopt::Long> definition.  Of course, you can write
 as this:
@@ -112,8 +112,8 @@ option.  When called, hash object is passed through C<$_>.
         $_->{left} = $_->{right} = $_[1];
     };
 
-You can use this for C<< "<>" >> too.  In this case, spec parameter
-does not matter and is not required.
+You can use this for C<< "<>" >> too.  In that case, spec parameter
+does not matter and not required.
 
     has ARGV => default => [];
     has "<>" => action => sub {

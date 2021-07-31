@@ -29,10 +29,10 @@ Version 0.9905
 # DESCRIPTION
 
 **Getopt::EX::Hashed** is a module to automate a hash object to store
-command line option values.  Major objective of this module is to
-integrate initialization and specification into single place.  Module
-name shares **Getopt::EX**, but it works independently from other
-modules included in **Getopt::EX**, so far.
+command line option values.  Major objective of this module is
+integrating initialization and specification into single place.
+Module name shares **Getopt::EX**, but it works independently from
+other modules included in **Getopt::EX**, so far.
 
 In the current implementation, using **Getopt::Long**, or compatible
 module such as **Getopt::EX::Long** is assumed.  It is configurable,
@@ -48,7 +48,7 @@ Declare option parameters in a form of:
 
 If array reference is given, multiple names can be declared at once.
 
-    has [ 'left', 'right' ] => ( param => value, ... );
+    has [ 'left', 'right' ] => ( spec => "=i" );
 
 If the name start with plus (`+`), given parameters are added to
 current value.
@@ -68,7 +68,7 @@ Following parameters are available.
 
     will be compiled into string:
 
-        start|s|begin:i
+        start|s|begin=i
 
     which conform to `Getopt::Long` definition.  Of course, you can write
     as this:
@@ -107,8 +107,8 @@ Following parameters are available.
             $_->{left} = $_->{right} = $_[1];
         };
 
-    You can use this for `"<>"` too.  In this case, spec parameter
-    does not matter and is not required.
+    You can use this for `"<>"` too.  In that case, spec parameter
+    does not matter and not required.
 
         has ARGV => default => [];
         has "<>" => action => sub {
