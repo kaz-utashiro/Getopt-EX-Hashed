@@ -230,8 +230,9 @@ use Data::Dumper;
 use Exporter 'import';
 our @EXPORT = qw(has new);
 
+use List::Util qw(first);
+
 my @Member;
-my %Member;
 
 my %Config = (
     DEBUG_PRINT        => 0,
@@ -257,22 +258,22 @@ sub unimport {
 }
 
 sub reset {
-    @Member = %Member = ();
+    @Member = ();
     return $_[0];
 }
 
 sub has {
-    my($name, %param) = @_;
-    my @name = ref $name eq 'ARRAY' ? @$name : $name;
-    for (@name) {
-	my $append = s/^\+//;
+    my($key, @param) = @_;
+    my @name = ref $key eq 'ARRAY' ? @$key : $key;
+    for my $name (@name) {
+	my $append = $name =~ s/^\+//;
+	my $i = first { $Member[$_]->[0] eq $name } 0 .. $#Member;
 	if ($append) {
-	    $Member{$_} or die "$_: Not defined\n";
-	    $Member{$_} = { %{$Member{$_}}, %param };
+	    defined $i or die "$name: Not found\n";
+	    push @{$Member[$i]}, @param;
 	} else {
-	    $Member{$_} and die "$_: Duplicated\n";
-	    push @Member, $_;
-	    $Member{$_} = \%param;
+	    defined $i and die "$name: Duplicated\n";
+	    push @Member, [ $name, @param ];
 	}
     }
 }
@@ -280,9 +281,14 @@ sub has {
 sub new {
     my $class = shift;
     my $obj = bless {}, __PACKAGE__;
-    my $member = $obj->{__Hash__} = { %Member };
-    my $order = $obj->{__Order__} = [ @Member ];
     our @ISA = $class if $class ne __PACKAGE__;
+    my $member = $obj->{__Hash__} = {
+	map {
+	    my($key, %param) = @$_;
+	    $key => \%param;
+	} @Member
+    };
+    my $order = $obj->{__Order__} = [ map $_->[0], @Member ];
     for my $key (@{$order}) {
 	my $m = $member->{$key};
 	$obj->{$key} = $m->{default};
@@ -295,7 +301,7 @@ sub new {
 sub optspec {
     my $obj = shift;
     my $member = $obj->{__Hash__};
-    do {
+    my @optlist = do {
 	map  {
 	    my($name, $spec) = @$_;
 	    my $compiled = _compile($obj, $name, $spec);
@@ -331,6 +337,7 @@ sub optspec {
 	map  { [ $_ => $member->{$_}->{spec} ] }
 	@{$obj->{__Order__}};
     };
+    @optlist;
 }
 
 my $spec_re = qr/[!+=:]/;
