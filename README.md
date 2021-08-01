@@ -95,7 +95,7 @@ Following parameters are available.
 - **default** => _value_
 
     Set default value.  If no default is given, the member is initialized
-    as `undef`.  See **action**.
+    as `undef`.
 
 - **action** => _coderef_
 
@@ -115,9 +115,21 @@ Following parameters are available.
             push @{$_->{ARGV}}, $_[0];
         };
 
-    In fact, **default** and **action** parameters are twins and works same.
-    Parameter **action** is just a little more understandable, one byte
-    shorter, and verifies the value.  They are exclusive.
+    In fact, **default** parameter takes code reference too.  It is stored
+    in the hash object and the code works almost same.  But the hash value
+    can not be used for option storage.
+
+    Because **action** function intercept the option assignment, it can be
+    used to verify the parameter.
+
+        has age =>
+            spec => '=i',
+            action => sub {
+                my($name, $i) = @_;
+                (0 <= $i and $i <= 150) or
+                    die "$name: have to be in 0 to 150 range.\n";
+                $_->{$name} = $i;
+            };
 
 # METHOD
 
@@ -138,12 +150,13 @@ Following parameters are available.
 
     is just a shortcut for:
 
-        GetOptions($obj, $obj->optspec)
+        GetOptions($obj->optspec)
 
 - **optspec**
 
     Return option specification list which can be given to `GetOptions`
-    function with the hash object.
+    function.  GetOptions has a capability of storing values in a hash, by
+    giving the hash reference as a first argument, but it is not expected.
 
 - **use\_keys**
 

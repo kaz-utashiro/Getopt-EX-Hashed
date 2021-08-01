@@ -100,7 +100,7 @@ There is no difference with ones in B<spec> parameter.
 =item B<default> => I<value>
 
 Set default value.  If no default is given, the member is initialized
-as C<undef>.  See B<action>.
+as C<undef>.
 
 =item B<action> => I<coderef>
 
@@ -120,9 +120,21 @@ does not matter and not required.
         push @{$_->{ARGV}}, $_[0];
     };
 
-In fact, B<default> and B<action> parameters are twins and works same.
-Parameter B<action> is just a little more understandable, one byte
-shorter, and verifies the value.  They are exclusive.
+In fact, B<default> parameter takes code reference too.  It is stored
+in the hash object and the code works almost same.  But the hash value
+can not be used for option storage.
+
+Because B<action> function intercept the option assignment, it can be
+used to verify the parameter.
+
+    has age =>
+        spec => '=i',
+        action => sub {
+            my($name, $i) = @_;
+            (0 <= $i and $i <= 150) or
+                die "$name: have to be in 0 to 150 range.\n";
+            $_->{$name} = $i;
+        };
 
 =back
 
@@ -147,12 +159,13 @@ appropriate parameters.
 
 is just a shortcut for:
 
-    GetOptions($obj, $obj->optspec)
+    GetOptions($obj->optspec)
 
 =item B<optspec>
 
 Return option specification list which can be given to C<GetOptions>
-function with the hash object.
+function.  GetOptions has a capability of storing values in a hash, by
+giving the hash reference as a first argument, but it is not expected.
 
 =item B<use_keys>
 
@@ -221,6 +234,7 @@ my @Member;
 my %Member;
 
 my %Config = (
+    DEBUG_PRINT        => 0,
     LOCK_KEYS          => 1,
     REPLACE_UNDERSCORE => 1,
     RESET_AFTER_NEW    => 0,
@@ -271,23 +285,7 @@ sub new {
     our @ISA = $class if $class ne __PACKAGE__;
     for my $key (@{$order}) {
 	my $m = $member->{$key};
-	$obj->{$key} = do {
-	    my($default, $action) = @{$m}{qw(default action)};
-	    if ($action) {
-		defined $default and
-		    die "$key: Don't define both default and action.\n";
-		ref($action) eq 'CODE' or
-		    die "$key: action have to be coderef.\n";
-		$default = $action;
-	    }
-	    if (defined($default) and ref($default) eq 'CODE') {
-		sub {
-		    $default->(@_) for $obj;
-		};
-	    } else {
-		$default;
-	    }
-	};
+	$obj->{$key} = $m->{default};
     }
     lock_keys %{$obj} if $Config{LOCK_KEYS};
     __PACKAGE__->reset if $Config{RESET_AFTER_NEW};
@@ -298,17 +296,38 @@ sub optspec {
     my $obj = shift;
     my $member = $obj->{__Hash__};
     do {
-	map  { _optspec($obj, @$_) }
+	map  {
+	    my($name, $spec) = @$_;
+	    my $compiled = _compile($obj, $name, $spec);
+	    my $m = $member->{$name};
+	    my $dest = do {
+		if (my $action = $m->{action}) {
+		    ref $action eq 'CODE' or
+			die "$name: action must be coderef.\n";
+		    sub { &$action for $obj };
+		} else {
+		    if (ref $obj->{$name} eq 'CODE') {
+			sub { &{$obj->{$name}} for $obj };
+		    } else {
+			\$obj->{$name};
+		    }
+		}
+	    };
+	    $compiled => $dest;
+	}
+	# spec .= alias
 	map  {
 	    if (my $alias = $member->{$_->[0]}->{alias}) {
 		$_->[1] .= " $alias";
 	    }
 	    $_;
 	}
+	# spec = '' if $name eq = '<>'
 	grep {
 	    $_->[0] eq '<>' and $_->[1] //= '';
 	    defined $_->[1];
 	}
+	# get spec
 	map  { [ $_ => $member->{$_}->{spec} ] }
 	@{$obj->{__Order__}};
     };
@@ -316,7 +335,7 @@ sub optspec {
 
 my $spec_re = qr/[!+=:]/;
 
-sub _optspec {
+sub _compile {
     my $obj = shift;
     my($name, $args) = @_;
 
@@ -344,7 +363,7 @@ sub getopt {
     my $obj = shift;
     my $getopt = caller . "::" . $Config{GETOPT};
     no strict 'refs';
-    &{$getopt}($obj, $obj->optspec);
+    &{$getopt}($obj->optspec);
 }
 
 sub use_keys {
