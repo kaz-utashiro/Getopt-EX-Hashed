@@ -26,7 +26,7 @@ Version 0.9906
       my $app = shift;
       use Getopt::Long;
       $app->getopt or pod2usage();
-      if ($app->{start}) {
+      if ($app->start) {
           ...
 
 =head1 DESCRIPTION
@@ -40,6 +40,8 @@ other modules included in B<Getopt::EX>, so far.
 In the current implementation, using B<Getopt::Long>, or compatible
 module such as B<Getopt::EX::Long> is assumed.  It is configurable,
 but no other module is supported now.
+
+Accessor methods are automatically generated.
 
 =head1 FUNCTION
 
@@ -240,6 +242,8 @@ my %Config = (
     REPLACE_UNDERSCORE => 1,
     RESET_AFTER_NEW    => 0,
     GETOPT             => 'GetOptions',
+    ACCESSOR           => 1,
+    ACCESSOR_PREFIX    => '',
     );
 lock_keys %Config;
 
@@ -292,6 +296,14 @@ sub new {
     for my $key (@{$order}) {
 	my $m = $member->{$key};
 	$obj->{$key} = $m->{default};
+	if ($Config{ACCESSOR}) {
+	    no strict 'refs';
+	    my $prefix = $Config{ACCESSOR_PREFIX};
+	    *{"$class\::$prefix$key"} = sub {
+		$#_ ? $_[0]{$key} = $_[1]
+		    : $_[0]{$key};
+	    };
+	}
     }
     lock_keys %{$obj} if $Config{LOCK_KEYS};
     __PACKAGE__->reset if $Config{RESET_AFTER_NEW};

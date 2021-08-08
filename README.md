@@ -23,7 +23,7 @@ Version 0.9906
         my $app = shift;
         use Getopt::Long;
         $app->getopt or pod2usage();
-        if ($app->{start}) {
+        if ($app->start) {
             ...
 
 # DESCRIPTION
@@ -37,6 +37,8 @@ other modules included in **Getopt::EX**, so far.
 In the current implementation, using **Getopt::Long**, or compatible
 module such as **Getopt::EX::Long** is assumed.  It is configurable,
 but no other module is supported now.
+
+Accessor methods are automatically generated.
 
 # FUNCTION
 
