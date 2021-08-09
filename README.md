@@ -17,13 +17,14 @@ Version 0.9908
     use Getopt::EX::Hashed;
     has start => ( spec => "=i s begin", default => 1 );
     has end   => ( spec => "=i e" );
+    has file  => ( spec => "=s", is => 'rw' );
     no  Getopt::EX::Hashed;
 
     sub run {
         my $app = shift;
         use Getopt::Long;
         $app->getopt or pod2usage();
-        if ($app->start) {
+        if ($app->{start}) {
             ...
 
 # DESCRIPTION

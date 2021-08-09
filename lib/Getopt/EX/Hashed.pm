@@ -20,13 +20,14 @@ Version 0.9908
   use Getopt::EX::Hashed;
   has start => ( spec => "=i s begin", default => 1 );
   has end   => ( spec => "=i e" );
+  has file  => ( spec => "=s", is => 'rw' );
   no  Getopt::EX::Hashed;
 
   sub run {
       my $app = shift;
       use Getopt::Long;
       $app->getopt or pod2usage();
-      if ($app->start) {
+      if ($app->{start}) {
           ...
 
 =head1 DESCRIPTION
@@ -236,11 +237,15 @@ use Carp;
 use Data::Dumper;
 
 use Exporter 'import';
-our @EXPORT = qw(has new);
+our @EXPORT = qw(has new getopt optspec);
 
 use List::Util qw(first);
 
-my @Member;
+# store metadata in caller context
+sub __Member__ {
+    no strict 'refs';
+    \@{$_[0]."::Getopt_EX_Hashed__Member__"};
+}
 
 my %Config = (
     DEBUG_PRINT        => 0,
@@ -268,19 +273,21 @@ sub unimport {
 }
 
 sub reset {
-    @Member = ();
+    my $m = __Member__(caller);
+    @{$m} = ();
     return $_[0];
 }
 
 sub has {
     my($key, @param) = @_;
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
+    my $m = __Member__(caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
-	my $i = first { $Member[$_]->[0] eq $name } 0 .. $#Member;
+	my $i = first { ${$m}[$_]->[0] eq $name } 0 .. $#{$m};
 	if ($append) {
 	    defined $i or die "$name: Not found\n";
-	    push @{$Member[$i]}, @param;
+	    push @{${$m}[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
 	    if (my $default = $Config{DEFAULT}) {
@@ -288,22 +295,22 @@ sub has {
 		    unshift @param, @{$default};
 		}
 	    }
-	    push @Member, [ $name, @param ];
+	    push @{$m}, [ $name, @param ];
 	}
     }
 }
 
 sub new {
     my $class = shift;
-    my $obj = bless {}, __PACKAGE__;
-    our @ISA = $class if $class ne __PACKAGE__;
+    my $obj = bless {}, $class;
+    my $m = __Member__($class eq __PACKAGE__ ? caller : $class);
     my $member = $obj->{__Hash__} = {
 	map {
 	    my($key, %param) = @$_;
 	    $key => \%param;
-	} @Member
+	} @{$m}
     };
-    my $order = $obj->{__Order__} = [ map $_->[0], @Member ];
+    my $order = $obj->{__Order__} = [ map $_->[0], @{$m} ];
     for my $key (@{$order}) {
 	my $m = $member->{$key};
 	$obj->{$key} = $m->{default};
