@@ -25,7 +25,7 @@ my @argv = qw(
 
 BEGIN {
     $App::Foo::TAKE_IT_ALL = 1;
-    $App::Foo::ACCESSOR_RO = 1;
+    $App::Foo::ACCESSOR_DEFAULT_RO = 1;
 }
 
 use App::Foo;
