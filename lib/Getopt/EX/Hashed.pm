@@ -113,16 +113,16 @@ as C<undef>.
 
 =item B<action> => I<coderef>
 
-Parameter B<action> takes code reference which called to process the
-option.  When called, hash object is passed through C<$_>.
+Parameter B<action> takes code reference which is called to process
+the option.  When called, hash object is passed through C<$_>.
 
     has [ qw(left right both) ] => spec => '=i';
     has "+both" => action => sub {
         $_->{left} = $_->{right} = $_[1];
     };
 
-You can use this for C<< "<>" >> too.  In that case, spec parameter
-does not matter and not required.
+You can use this for C<< "<>" >> to catch everything.  In that case,
+spec parameter does not matter and not required.
 
     has ARGV => default => [];
     has "<>" => action => sub {
