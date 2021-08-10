@@ -250,7 +250,8 @@ use List::Util qw(first);
 # store metadata in caller context
 sub __Member__ {
     no strict 'refs';
-    \@{$_[0]."::Getopt_EX_Hashed__Member__"};
+    state $sub = __PACKAGE__ =~ s/::/_/gr;
+    \@{"$_[0]\::$sub\::__Member__"};
 }
 
 my %Config = (
