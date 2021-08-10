@@ -236,8 +236,14 @@ use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Carp;
 use Data::Dumper;
 
-use Exporter 'import';
-our @EXPORT = qw(has new getopt optspec);
+our @EXPORT = qw(has);
+
+sub import {
+    my $caller = caller;
+    no strict 'refs';
+    push @{"$caller\::ISA"}, __PACKAGE__;
+    *{"$caller\::$_"} = \&{$_} for @EXPORT;
+}
 
 use List::Util qw(first);
 
