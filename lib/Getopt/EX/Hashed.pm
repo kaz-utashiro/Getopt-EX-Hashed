@@ -38,6 +38,17 @@ use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Carp;
 use Data::Dumper;
 
+my %DefaultConfig = (
+    DEBUG_PRINT        => 0,
+    LOCK_KEYS          => 1,
+    REPLACE_UNDERSCORE => 1,
+    RESET_AFTER_NEW    => 0,
+    GETOPT             => 'GetOptions',
+    ACCESSOR_PREFIX    => '',
+    DEFAULT            => undef,
+    );
+lock_keys %DefaultConfig;
+
 our @EXPORT = qw(has);
 
 sub import {
@@ -45,6 +56,11 @@ sub import {
     no strict 'refs';
     push @{"$caller\::ISA"}, __PACKAGE__;
     *{"$caller\::$_"} = \&{$_} for @EXPORT;
+    my $c = __Config__($caller);
+    unless (%{$c}) {
+	%{$c} = %DefaultConfig;
+	lock_keys %{$c};
+    }
 }
 
 use List::Util qw(first);
@@ -55,22 +71,17 @@ sub __Member__ {
     state $sub = __PACKAGE__ =~ s/::/_/gr;
     \@{"$_[0]\::$sub\::__Member__"};
 }
-
-my %Config = (
-    DEBUG_PRINT        => 0,
-    LOCK_KEYS          => 1,
-    REPLACE_UNDERSCORE => 1,
-    RESET_AFTER_NEW    => 0,
-    GETOPT             => 'GetOptions',
-    ACCESSOR_PREFIX    => '',
-    DEFAULT            => undef,
-    );
-lock_keys %Config;
+sub __Config__ {
+    no strict 'refs';
+    state $sub = __PACKAGE__ =~ s/::/_/gr;
+    \%{"$_[0]\::$sub\::__Config__"};
+}
 
 sub configure {
     my $class = shift;
+    my $c = __Config__($class eq __PACKAGE__ ? caller : $class);
     while (my($key, $value) = splice @_, 0, 2) {
-	$Config{$key} = $value;
+	$c->{$key} = $value;
     }
     return $class;
 }
@@ -90,7 +101,9 @@ sub reset {
 sub has {
     my($key, @param) = @_;
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
-    my $m = __Member__(caller);
+    my $caller = caller;
+    my $m = __Member__($caller);
+    my $c = __Config__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
 	my $i = first { ${$m}[$_]->[0] eq $name } 0 .. $#{$m};
@@ -99,7 +112,7 @@ sub has {
 	    push @{${$m}[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
-	    if (my $default = $Config{DEFAULT}) {
+	    if (my $default = $c->{DEFAULT}) {
 		if (ref $default eq 'ARRAY') {
 		    unshift @param, @{$default};
 		}
@@ -113,6 +126,7 @@ sub new {
     my $class = shift;
     my $obj = bless {}, $class;
     my $m = __Member__($class eq __PACKAGE__ ? caller : $class);
+    my $c = __Config__($class eq __PACKAGE__ ? caller : $class);
     my $member = $obj->{__Hash__} = {
 	map {
 	    my($key, %param) = @$_;
@@ -125,12 +139,12 @@ sub new {
 	$obj->{$key} = $m->{default};
 	if (my $is = $m->{is}) {
 	    no strict 'refs';
-	    my $access = $Config{ACCESSOR_PREFIX} . $key;
+	    my $access = $c->{ACCESSOR_PREFIX} . $key;
 	    *{"$class\::$access"} = _accessor($is, $key);
 	}
     }
-    lock_keys %{$obj} if $Config{LOCK_KEYS};
-    __PACKAGE__->reset if $Config{RESET_AFTER_NEW};
+    lock_keys %{$obj} if $c->{LOCK_KEYS};
+    __PACKAGE__->reset if $c->{RESET_AFTER_NEW};
     $obj;
 }
 
@@ -207,7 +221,8 @@ sub _compile {
     };
     my @alias = grep !/$spec_re/, @args;
     my @names = ($name, @alias);
-    if ($Config{REPLACE_UNDERSCORE}) {
+    my $c = __Config__(ref $obj);
+    if ($c->{REPLACE_UNDERSCORE}) {
 	for ($name, @alias) {
 	    push @names, tr[_][-]r if /_/;
 	}
@@ -218,7 +233,8 @@ sub _compile {
 
 sub getopt {
     my $obj = shift;
-    my $getopt = caller . "::" . $Config{GETOPT};
+    my $c = __Config__(ref $obj);
+    my $getopt = caller . "::" . $c->{GETOPT};
     no strict 'refs';
     &{$getopt}($obj->optspec);
 }
