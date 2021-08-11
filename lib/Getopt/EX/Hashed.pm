@@ -37,6 +37,19 @@ use warnings;
 use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Carp;
 use Data::Dumper;
+use List::Util qw(first);
+
+# store metadata in caller context
+my  %__DB__;
+sub  __DB__ {
+    $__DB__{$_[0]} //= do {
+	no strict 'refs';
+	state $sub = __PACKAGE__ =~ s/::/_/gr;
+	\%{"$_[0]\::$sub\::__DB__"};
+    };
+}
+sub __Member__ { __DB__(@_)->{Member} //= [] }
+sub __Config__ { __DB__(@_)->{Config} //= {} }
 
 my %DefaultConfig = (
     DEBUG_PRINT        => 0,
@@ -63,23 +76,10 @@ sub import {
     }
 }
 
-use List::Util qw(first);
-
-# store metadata in caller context
-sub __Member__ {
-    no strict 'refs';
-    state $sub = __PACKAGE__ =~ s/::/_/gr;
-    \@{"$_[0]\::$sub\::__Member__"};
-}
-sub __Config__ {
-    no strict 'refs';
-    state $sub = __PACKAGE__ =~ s/::/_/gr;
-    \%{"$_[0]\::$sub\::__Config__"};
-}
-
 sub configure {
     my $class = shift;
-    my $c = __Config__($class eq __PACKAGE__ ? caller : $class);
+    my $pkg = $class ne __PACKAGE__ ? $class : caller;
+    my $c = __Config__($pkg);
     while (my($key, $value) = splice @_, 0, 2) {
 	$c->{$key} = $value;
     }
@@ -125,8 +125,9 @@ sub has {
 sub new {
     my $class = shift;
     my $obj = bless {}, $class;
-    my $m = __Member__($class eq __PACKAGE__ ? caller : $class);
-    my $c = __Config__($class eq __PACKAGE__ ? caller : $class);
+    my $pkg = $class ne __PACKAGE__ ? $class : caller;
+    my $m = __Member__($pkg);
+    my $c = __Config__($pkg);
     my $member = $obj->{__Hash__} = {
 	map {
 	    my($key, %param) = @$_;
