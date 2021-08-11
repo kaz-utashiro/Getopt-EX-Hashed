@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9910';
+our $VERSION = '0.9911';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9910
+Version 0.9911
 
 =head1 SYNOPSIS
 
@@ -209,6 +209,8 @@ my $spec_re = qr/[!+=:]/;
 
 sub _compile {
     my $obj = shift;
+    my $ref = ref $obj;
+    my $pkg = $ref ne __PACKAGE__ ? $ref : caller;
     my($name, $args) = @_;
 
     return $name if $name eq '<>';
@@ -222,7 +224,7 @@ sub _compile {
     };
     my @alias = grep !/$spec_re/, @args;
     my @names = ($name, @alias);
-    my $c = __Config__(ref $obj);
+    my $c = __Config__($pkg);
     if ($c->{REPLACE_UNDERSCORE}) {
 	for ($name, @alias) {
 	    push @names, tr[_][-]r if /_/;
@@ -234,7 +236,9 @@ sub _compile {
 
 sub getopt {
     my $obj = shift;
-    my $c = __Config__(ref $obj);
+    my $ref = ref $obj;
+    my $pkg = $ref ne __PACKAGE__ ? $ref : caller;
+    my $c = __Config__($pkg);
     my $getopt = caller . "::" . $c->{GETOPT};
     no strict 'refs';
     &{$getopt}($obj->optspec);

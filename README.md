@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9910
+Version 0.9911
 
 # SYNOPSIS
 
