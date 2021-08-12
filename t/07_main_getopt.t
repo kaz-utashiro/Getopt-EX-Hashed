@@ -20,7 +20,7 @@ has so_long  => ( spec => '' );
 
 use Getopt::Long;
 my $app = Getopt::EX::Hashed->new() or die;
-GetOptions($app->optspec) or die;
+$app->getopt or die;
 
 is($app->{string}, "Alice", "String");
 is($app->{say}, "Hello", "String (default)");
