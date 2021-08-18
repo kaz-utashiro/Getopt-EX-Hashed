@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9912
+Version 0.9913
 
 # SYNOPSIS
 
@@ -133,7 +133,7 @@ Following parameters are available.
 
     Parameter **must** takes a code reference to validate option values.
     It takes same arguments as **action** and returns boolean.  With next
-    example, option **--answer** only takes 42 as a valid value.
+    example, option **--answer** takes only 42 as a valid value.
 
         has answer =>
             spec => '=i',
