@@ -55,6 +55,7 @@ my %DefaultConfig = (
     DEBUG_PRINT        => 0,
     LOCK_KEYS          => 1,
     REPLACE_UNDERSCORE => 1,
+    REMOVE_UNDERSCORE  => 0,
     RESET_AFTER_NEW    => 0,
     GETOPT             => 'GetOptions',
     ACCESSOR_PREFIX    => '',
@@ -68,11 +69,11 @@ sub import {
     my $caller = caller;
     no strict 'refs';
     push @{"$caller\::ISA"}, __PACKAGE__;
-    *{"$caller\::$_"} = \&{$_} for @EXPORT;
+    *{"$caller\::$_"} = \&$_ for @EXPORT;
     my $C = __Config__($caller);
-    unless (%{$C}) {
-	%{$C} = %DefaultConfig or die "something wrong!";
-	lock_keys %{$C};
+    unless (%$C) {
+	%$C = %DefaultConfig or die "something wrong!";
+	lock_keys %$C;
     }
 }
 
@@ -94,7 +95,7 @@ sub unimport {
 
 sub reset {
     my $M = __Member__(caller);
-    @{$M} = ();
+    @$M = ();
     return $_[0];
 }
 
@@ -106,18 +107,18 @@ sub has {
     my $C = __Config__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
-	my $i = first { ${$M}[$_]->[0] eq $name } 0 .. $#{$M};
+	my $i = first { $M->[$_]->[0] eq $name } 0 .. $#{$M};
 	if ($append) {
 	    defined $i or die "$name: Not found\n";
-	    push @{${$M}[$i]}, @param;
+	    push @{$M->[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
 	    if (my $default = $C->{DEFAULT}) {
 		if (ref $default eq 'ARRAY') {
-		    unshift @param, @{$default};
+		    unshift @param, @$default;
 		}
 	    }
-	    push @{$M}, [ $name, @param ];
+	    push @$M, [ $name, @param ];
 	}
     }
 }
@@ -132,10 +133,10 @@ sub new {
 	map {
 	    my($key, %param) = @$_;
 	    $key => \%param;
-	} @{$M}
+	} @$M
     };
-    my $order = $obj->{__Order__} = [ map $_->[0], @{$M} ];
-    for my $key (@{$order}) {
+    my $order = $obj->{__Order__} = [ map $_->[0], @$M ];
+    for my $key (@$order) {
 	my $m = $member->{$key};
 	$obj->{$key} = $m->{default};
 	if (my $is = $m->{is}) {
@@ -144,7 +145,7 @@ sub new {
 	    *{"$class\::$access"} = _accessor($is, $key);
 	}
     }
-    lock_keys %{$obj} if $C->{LOCK_KEYS};
+    lock_keys %$obj if $C->{LOCK_KEYS};
     __PACKAGE__->reset if $C->{RESET_AFTER_NEW};
     $obj;
 }
@@ -154,11 +155,11 @@ sub _accessor {
     {
 	ro => sub {
 	    $#_ and die "$name is readonly\n";
-	    $_[0]{$name};
+	    $_[0]->{$name};
 	},
 	rw => sub {
-	    $#_ and do { $_[0]{$name} = $_[1]; return $_[0] };
-	    $_[0]{$name};
+	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
+	    $_[0]->{$name};
 	}
     }->{$is} or die "$name has invalid 'is' parameter.\n";
 }
@@ -231,10 +232,9 @@ sub _compile {
     my @alias = grep !/$spec_re/, @args;
     my @names = ($name, @alias);
     my $C = __Config__($ctx);
-    if ($C->{REPLACE_UNDERSCORE}) {
-	for ($name, @alias) {
-	    push @names, tr[_][-]r if /_/;
-	}
+    for ($name, @alias) {
+	push @names, tr[_][-]r if /_/ && $C->{REPLACE_UNDERSCORE};
+	push @names, tr[_][]dr if /_/ && $C->{REMOVE_UNDERSCORE};
     }
     push @names, '' if @names and $spec !~ /^($spec_re|$)/;
     join('|', @names) . $spec;
@@ -247,7 +247,7 @@ sub getopt {
     my $C = __Config__($ctx);
     my $getopt = caller . "::" . $C->{GETOPT};
     no strict 'refs';
-    &{$getopt}(_optspec($obj, $ctx));
+    $getopt->(_optspec($obj, $ctx));
 }
 
 sub use_keys {
