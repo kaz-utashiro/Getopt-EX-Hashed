@@ -48,6 +48,7 @@
       },
       "test" : {
          "requires" : {
+            "Getopt::Long" : "0",
             "Test::More" : "0.98"
          }
       }

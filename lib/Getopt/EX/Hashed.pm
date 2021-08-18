@@ -18,9 +18,10 @@ Version 0.9912
   package App::foo;
 
   use Getopt::EX::Hashed;
-  has start => ( spec => "=i s begin", default => 1 );
-  has end   => ( spec => "=i e" );
-  has file  => ( spec => "=s", is => 'rw' );
+  has start  => ( spec => "=i s begin", default => 1 );
+  has end    => ( spec => "=i e" );
+  has file   => ( spec => "=s", is => 'rw' );
+  has answer => ( spec => '=i', must => sub { $_[1] == 42 } );
   no  Getopt::EX::Hashed;
 
   sub run {
@@ -175,26 +176,7 @@ sub _optspec {
     my $obj = shift;
     my $ctx = shift;
     my $member = $obj->{__Hash__};
-    my @optlist = do {
-	map  {
-	    my($name, $spec) = @$_;
-	    my $compiled = _compile($ctx, $name, $spec);
-	    my $m = $member->{$name};
-	    my $dest = do {
-		if (my $action = $m->{action}) {
-		    ref $action eq 'CODE' or
-			die "$name: action must be coderef.\n";
-		    sub { &$action for $obj };
-		} else {
-		    if (ref $obj->{$name} eq 'CODE') {
-			sub { &{$obj->{$name}} for $obj };
-		    } else {
-			\$obj->{$name};
-		    }
-		}
-	    };
-	    $compiled => $dest;
-	}
+    my @spec = do {
 	# spec .= alias
 	map  {
 	    if (my $alias = $member->{$_->[0]}->{alias}) {
@@ -211,7 +193,44 @@ sub _optspec {
 	map  { [ $_ => $member->{$_}->{spec} ] }
 	@{$obj->{__Order__}};
     };
-    @optlist;
+    my @optlist = map {
+	my($name, $spec) = @$_;
+	my $compiled = _compile($ctx, $name, $spec);
+	my $m = $member->{$name};
+	my $action = $m->{action};
+	$action and ref $action ne 'CODE'
+	    and die "$name->action: not a coderef.\n";
+	my $dest = do {
+	    if (my $must = $m->{must}) {
+		ref $must ne 'CODE'
+		    and die "$name->must: not a coderef.\n";
+		$action ||= \&_generic_setter;
+		sub {
+		    local $_ = $obj;
+		    &$must or die "@_: invalid value.\n";
+		    &$action;
+		};
+	    }
+	    elsif ($action) {
+		sub { &$action for $obj };
+	    }
+	    else {
+		if (ref $obj->{$name} eq 'CODE') {
+		    sub { &{$obj->{$name}} for $obj };
+		} else {
+		    \$obj->{$name};
+		}
+	    }
+	};
+	$compiled => $dest;
+    } @spec;
+}
+
+sub _generic_setter {
+    my $dest = $_->{$_[0]};
+    (ref $dest eq 'ARRAY') ? do { push @$dest, $_[1] } :
+    (ref $dest eq 'HASH' ) ? do { $dest->{$_[1]} = $_[2] }
+                           : do { $_->{$_[0]} = $_[1] };
 }
 
 my $spec_re = qr/[!+=:]/;
@@ -363,17 +382,17 @@ In fact, B<default> parameter takes code reference too.  It is stored
 in the hash object and the code works almost same.  But the hash value
 can not be used for option storage.
 
-Because B<action> function intercept the option assignment, it can be
-used to verify the parameter.
+=item B<must> => I<coderef>
 
-    has age =>
+Parameter B<must> takes a code reference to validate option values.
+It takes same arguments as B<action> and returns boolean.  With next
+example, option B<--answer> takes only 42 as a valid value.
+
+    has answer =>
         spec => '=i',
-        action => sub {
-            my($name, $i) = @_;
-            (0 <= $i and $i <= 150) or
-                die "$name: have to be in 0 to 150 range.\n";
-            $_->{$name} = $i;
-        };
+        must => sub { $_[1] == 42 };
+
+Can be used with B<action> parameter.
 
 =back
 
