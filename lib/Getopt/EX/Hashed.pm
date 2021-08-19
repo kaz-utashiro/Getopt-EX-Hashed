@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9913';
+our $VERSION = '0.9914';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9913
+Version 0.9914
 
 =head1 SYNOPSIS
 
@@ -302,7 +302,7 @@ In the current implementation, using B<Getopt::Long>, or compatible
 module such as B<Getopt::EX::Long> is assumed.  It is configurable,
 but no other module is supported now.
 
-Accessor methods are automatically generated when appropiate parameter
+Accessor methods are automatically generated when appropriate parameter
 is given.
 
 =head1 FUNCTION
@@ -431,10 +431,6 @@ Set the required regular expression pattern for the argument.
 
 Class method to get initialized hash object.
 
-=item B<configure>
-
-There should be some configurable variables, but not fixed yet.
-
 =item B<getopt>
 
 Call C<GetOptions> function defined in caller's context with
@@ -479,6 +475,57 @@ This is almost equivalent to the next code:
     my $obj = Getopt::EX::Hashed->new;
     Getopt::EX::Hashed->reset;
 
+=item B<configure> B<label> => I<value>, ...
+
+There are following configuration parameters.
+
+=over 7
+
+=item B<LOCK_KEYS> (default: 1)
+
+Lock hash keys.  This avoids accidental access to non-existing hash
+entry.
+
+=item B<REPLACE_UNDERSCORE> (default: 1)
+
+Produce alias with underscores replaced by dash.
+
+=item B<REMOVE_UNDERSCORE> (default: 0)
+
+Produce alias with underscores removed.
+
+=begin comment
+
+=item B<RESET_AFTER_NEW> (default: 0)
+
+Reset class information after new.
+
+=end comment
+
+=item B<GETOPT> (default: 'GetOptions')
+
+Set function name called from C<getopt> method.
+
+=item B<ACCESSOR_PREFIX>
+
+When specified, it is prepended to the member name to make accessor
+method.  If C<ACCESSOR_PREFIX> is defined as C<opt_>, accessor for
+member C<file> will be C<opt_file>.
+
+=item B<DEFAULT>
+
+Set default parameters.  At the call for C<has>, DEFAULT parameters
+are inserted before argument parameters.  So if both include same
+parameter, later one in argument list has precedence.  Incremental
+call with C<+> is not affected.
+
+Typical use of DEFAULT is C<is> to prepare accessor method for all
+following hash entries.  Declare C<< is => '' >> to reset.
+
+    Getopt::EX::Hashed->configure(is => 'ro');
+
+=back
+
 =back
 
 =head1 SEE ALSO
@@ -505,3 +552,7 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+#  LocalWords:  Accessor param ro rw accessor undef coderef qw ARGV
+#  LocalWords:  validator qr GETOPT GetOptions getopt obj optspec foo
+#  LocalWords:  Kazumasa Utashiro min

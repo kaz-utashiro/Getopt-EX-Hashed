@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9913
+Version 0.9914
 
 # SYNOPSIS
 
@@ -41,7 +41,7 @@ In the current implementation, using **Getopt::Long**, or compatible
 module such as **Getopt::EX::Long** is assumed.  It is configurable,
 but no other module is supported now.
 
-Accessor methods are automatically generated when appropiate parameter
+Accessor methods are automatically generated when appropriate parameter
 is given.
 
 # FUNCTION
@@ -159,10 +159,6 @@ for common rules.
 
     Class method to get initialized hash object.
 
-- **configure**
-
-    There should be some configurable variables, but not fixed yet.
-
 - **getopt**
 
     Call `GetOptions` function defined in caller's context with
@@ -206,6 +202,45 @@ for common rules.
 
         my $obj = Getopt::EX::Hashed->new;
         Getopt::EX::Hashed->reset;
+
+- **configure** **label** => _value_, ...
+
+    There are following configuration parameters.
+
+    - **LOCK\_KEYS** (default: 1)
+
+        Lock hash keys.  This avoids accidental access to non-existing hash
+        entry.
+
+    - **REPLACE\_UNDERSCORE** (default: 1)
+
+        Produce alias with underscores replaced by dash.
+
+    - **REMOVE\_UNDERSCORE** (default: 0)
+
+        Produce alias with underscores removed.
+
+    - **GETOPT** (default: 'GetOptions')
+
+        Set function name called from `getopt` method.
+
+    - **ACCESSOR\_PREFIX**
+
+        When specified, it is prepended to the member name to make accessor
+        method.  If `ACCESSOR_PREFIX` is defined as `opt_`, accessor for
+        member `file` will be `opt_file`.
+
+    - **DEFAULT**
+
+        Set default parameters.  At the call for `has`, DEFAULT parameters
+        are inserted before argument parameters.  So if both include same
+        parameter, later one in argument list has precedence.  Incremental
+        call with `+` is not affected.
+
+        Typical use of DEFAULT is `is` to prepare accessor method for all
+        following hash entries.  Declare `is => ''` to reset.
+
+            Getopt::EX::Hashed->configure(is => 'ro');
 
 # SEE ALSO
 
