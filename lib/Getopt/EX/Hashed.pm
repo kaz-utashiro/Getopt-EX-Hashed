@@ -20,7 +20,8 @@ Version 0.9913
   use Getopt::EX::Hashed;
   has start  => ( spec => "=i s begin", default => 1 );
   has end    => ( spec => "=i e" );
-  has file   => ( spec => "=s", is => 'rw' );
+  has file   => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
+  has score  => ( spec => '=i', min => 0, max => 100 );
   has answer => ( spec => '=i', must => sub { $_[1] == 42 } );
   no  Getopt::EX::Hashed;
 
@@ -38,7 +39,7 @@ use warnings;
 use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Carp;
 use Data::Dumper;
-use List::Util qw(first);
+use List::Util qw(first any);
 
 # store metadata in caller context
 my  %__DB__;
@@ -201,13 +202,11 @@ sub _optspec {
 	$action and ref $action ne 'CODE'
 	    and die "$name->action: not a coderef.\n";
 	my $dest = do {
-	    if (my $must = $m->{must}) {
-		ref $must ne 'CODE'
-		    and die "$name->must: not a coderef.\n";
+	    if (my $is_valid = _validator($m)) {
 		$action ||= \&_generic_setter;
 		sub {
 		    local $_ = $obj;
-		    &$must or die "@_: invalid value.\n";
+		    &$is_valid or die "@_: invalid option/value.\n";
 		    &$action;
 		};
 	    }
@@ -224,6 +223,18 @@ sub _optspec {
 	};
 	$compiled => $dest;
     } @spec;
+}
+
+sub _validator {
+    my $m = shift;
+    any { defined } @{$m}{qw(min max re must)} or return undef;
+    sub {
+	defined $m->{min}  and $_[-1] <  $m->{min} and return 0;
+	defined $m->{max}  and $_[-1] >  $m->{max} and return 0;
+	defined $m->{re}   and $_[-1] !~ $m->{re}  and return 0;
+	defined $m->{must} and not &{$m->{must}}   and return 0;
+	return 1;
+    }
 }
 
 sub _generic_setter {
@@ -317,7 +328,7 @@ Following parameters are available.
 
 =item B<is> => I<ro> | I<rw>
 
-If an B<is> parameter is given, accessor method for the member,
+If an C<is> parameter is given, accessor method for the member,
 read-only for I<ro> and read-write for I<rw>, is generated.
 
 =item B<spec> => I<string>
@@ -353,7 +364,7 @@ string as a value.  Otherwise, it is not considered as an option.
 =item B<alias> => I<string>
 
 Additional alias names can be specified by B<alias> parameter too.
-There is no difference with ones in B<spec> parameter.
+There is no difference with ones in C<spec> parameter.
 
 =item B<default> => I<value>
 
@@ -362,7 +373,7 @@ as C<undef>.
 
 =item B<action> => I<coderef>
 
-Parameter B<action> takes code reference which is called to process
+Parameter C<action> takes code reference which is called to process
 the option.  When called, hash object is passed through C<$_>.
 
     has [ qw(left right both) ] => spec => '=i';
@@ -378,21 +389,37 @@ spec parameter does not matter and not required.
         push @{$_->{ARGV}}, $_[0];
     };
 
-In fact, B<default> parameter takes code reference too.  It is stored
+In fact, C<default> parameter takes code reference too.  It is stored
 in the hash object and the code works almost same.  But the hash value
 can not be used for option storage.
 
+=back
+
+Following parameters are all for data validation.  First C<must> is a
+generic validator and can implement anything.  Others are shorthand
+for common rules.
+
+=over 7
+
 =item B<must> => I<coderef>
 
-Parameter B<must> takes a code reference to validate option values.
-It takes same arguments as B<action> and returns boolean.  With next
+Parameter C<must> takes a code reference to validate option values.
+It takes same arguments as C<action> and returns boolean.  With next
 example, option B<--answer> takes only 42 as a valid value.
 
     has answer =>
         spec => '=i',
         must => sub { $_[1] == 42 };
 
-Can be used with B<action> parameter.
+=item B<min> => I<number>
+
+=item B<max> => I<number>
+
+Set the minimum and maximum limit for the argument.
+
+=item B<re> => qr/I<pattern>/
+
+Set the required regular expression pattern for the argument.
 
 =back
 

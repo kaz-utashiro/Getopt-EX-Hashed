@@ -17,7 +17,8 @@ Version 0.9913
     use Getopt::EX::Hashed;
     has start  => ( spec => "=i s begin", default => 1 );
     has end    => ( spec => "=i e" );
-    has file   => ( spec => "=s", is => 'rw' );
+    has file   => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
+    has score  => ( spec => '=i', min => 0, max => 100 );
     has answer => ( spec => '=i', must => sub { $_[1] == 42 } );
     no  Getopt::EX::Hashed;
 
@@ -64,7 +65,7 @@ Following parameters are available.
 
 - **is** => _ro_ | _rw_
 
-    If an **is** parameter is given, accessor method for the member,
+    If an `is` parameter is given, accessor method for the member,
     read-only for _ro_ and read-write for _rw_, is generated.
 
 - **spec** => _string_
@@ -100,7 +101,7 @@ Following parameters are available.
 - **alias** => _string_
 
     Additional alias names can be specified by **alias** parameter too.
-    There is no difference with ones in **spec** parameter.
+    There is no difference with ones in `spec` parameter.
 
 - **default** => _value_
 
@@ -109,7 +110,7 @@ Following parameters are available.
 
 - **action** => _coderef_
 
-    Parameter **action** takes code reference which is called to process
+    Parameter `action` takes code reference which is called to process
     the option.  When called, hash object is passed through `$_`.
 
         has [ qw(left right both) ] => spec => '=i';
@@ -125,21 +126,32 @@ Following parameters are available.
             push @{$_->{ARGV}}, $_[0];
         };
 
-    In fact, **default** parameter takes code reference too.  It is stored
+    In fact, `default` parameter takes code reference too.  It is stored
     in the hash object and the code works almost same.  But the hash value
     can not be used for option storage.
 
+Following parameters are all for data validation.  First `must` is a
+generic validator and can implement anything.  Others are shorthand
+for common rules.
+
 - **must** => _coderef_
 
-    Parameter **must** takes a code reference to validate option values.
-    It takes same arguments as **action** and returns boolean.  With next
+    Parameter `must` takes a code reference to validate option values.
+    It takes same arguments as `action` and returns boolean.  With next
     example, option **--answer** takes only 42 as a valid value.
 
         has answer =>
             spec => '=i',
             must => sub { $_[1] == 42 };
 
-    Can be used with **action** parameter.
+- **min** => _number_
+- **max** => _number_
+
+    Set the minimum and maximum limit for the argument.
+
+- **re** => qr/_pattern_/
+
+    Set the required regular expression pattern for the argument.
 
 # METHOD
 
