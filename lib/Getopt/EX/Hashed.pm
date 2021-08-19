@@ -39,7 +39,7 @@ use warnings;
 use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Carp;
 use Data::Dumper;
-use List::Util qw(first any);
+use List::Util qw(first);
 
 # store metadata in caller context
 my  %__DB__;
@@ -227,7 +227,7 @@ sub _optspec {
 
 sub _validator {
     my $m = shift;
-    any { defined } @{$m}{qw(min max re must)} or return undef;
+    grep { defined } @{$m}{qw(min max re must)} or return undef;
     sub {
 	defined $m->{min}  and $_[-1] <  $m->{min} and return 0;
 	defined $m->{max}  and $_[-1] >  $m->{max} and return 0;
