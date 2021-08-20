@@ -179,7 +179,7 @@ for common rules.
 - **use\_keys**
 
     Because hash keys are protected by `Hash::Util::lock_keys`, accessing
-    non-existing member causes an error.  Use this function to declare new
+    non-existent member causes an error.  Use this function to declare new
     member key before use.
 
         $obj->use_keys( qw(foo bar) );
@@ -209,7 +209,7 @@ for common rules.
 
     - **LOCK\_KEYS** (default: 1)
 
-        Lock hash keys.  This avoids accidental access to non-existing hash
+        Lock hash keys.  This avoids accidental access to non-existent hash
         entry.
 
     - **REPLACE\_UNDERSCORE** (default: 1)

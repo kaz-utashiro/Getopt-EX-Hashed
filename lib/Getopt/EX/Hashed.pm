@@ -206,7 +206,10 @@ sub _optspec {
 		$action ||= \&_generic_setter;
 		sub {
 		    local $_ = $obj;
-		    &$is_valid or die "@_: invalid option/value.\n";
+		    &$is_valid or do {
+			local $" = ' -> ';
+			die "@_: invalid option/value.\n";
+		    };
 		    &$action;
 		};
 	    }
@@ -225,14 +228,24 @@ sub _optspec {
     } @spec;
 }
 
+my %tester = (
+    min  => sub { $_[-1] >= $_->{min} },
+    max  => sub { $_[-1] <= $_->{max} },
+    re   => sub { $_[-1] =~ $_->{re} },
+    must => sub { &{$_->{must}} },
+    );
+
+sub _tester {
+    my $m = shift;
+    map { $tester{$_} } grep { defined $m->{$_} } keys %tester;
+}
+
 sub _validator {
     my $m = shift;
-    grep { defined } @{$m}{qw(min max re must)} or return undef;
+    my @test = _tester($m) or return undef;
     sub {
-	defined $m->{min}  and $_[-1] <  $m->{min} and return 0;
-	defined $m->{max}  and $_[-1] >  $m->{max} and return 0;
-	defined $m->{re}   and $_[-1] !~ $m->{re}  and return 0;
-	defined $m->{must} and not &{$m->{must}}   and return 0;
+	local $_ = $m;
+	for my $test (@test) { &$test or return 0 }
 	return 1;
     }
 }
@@ -451,7 +464,7 @@ giving the hash reference as a first argument, but it is not expected.
 =item B<use_keys>
 
 Because hash keys are protected by C<Hash::Util::lock_keys>, accessing
-non-existing member causes an error.  Use this function to declare new
+non-existent member causes an error.  Use this function to declare new
 member key before use.
 
     $obj->use_keys( qw(foo bar) );
@@ -483,7 +496,7 @@ There are following configuration parameters.
 
 =item B<LOCK_KEYS> (default: 1)
 
-Lock hash keys.  This avoids accidental access to non-existing hash
+Lock hash keys.  This avoids accidental access to non-existent hash
 entry.
 
 =item B<REPLACE_UNDERSCORE> (default: 1)

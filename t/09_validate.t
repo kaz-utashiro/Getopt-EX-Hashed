@@ -30,8 +30,7 @@ VALID: {
 		     --nature Marvin=Paranoid
 		   );
 
-    my $app = Getopt::EX::Hashed->new() or die;
-    GetOptions($app->optspec); # or die;
+    (my $app = Getopt::EX::Hashed->new)->getopt;
 
     is($app->{answer}, 42, "Number");
     is($app->{answer_is}, "Answer is 42", "Number with action");
@@ -51,8 +50,7 @@ INVALID: {
 	    => map { $_ => undef } qw(min max re must);
     }
 
-    my $app = Getopt::EX::Hashed->new() or die;
-    GetOptions($app->optspec); # or die;
+    (my $app = Getopt::EX::Hashed->new)->getopt;
 
     isnt($app->{answer}, 41, "Number");
     isnt($app->{answer_is}, "Answer is 41", "Number with action");
