@@ -2,6 +2,10 @@ Revision history for Perl extension Getopt-EX-Hashed
 
 {{$NEXT}}
 
+0.9915 2021-08-22T14:50:29Z
+
+    - Implementation and document refine.
+
 0.9914 2021-08-19T16:44:49Z
 
     - Intoduce "min", "max", "re" validation parameters.
