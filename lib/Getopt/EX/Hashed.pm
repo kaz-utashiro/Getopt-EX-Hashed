@@ -339,10 +339,15 @@ Following parameters are available.
 
 =over 7
 
-=item B<is> => I<ro> | I<rw>
+=item B<is> => C<ro> | C<rw>
 
-If an C<is> parameter is given, accessor method for the member,
-read-only for I<ro> and read-write for I<rw>, is generated.
+To produce accessor method, C<is> parameter is necessary.  Set the
+value C<ro> for read-only, C<rw> for read-write.
+
+If you want to make accessor for all following members, use
+C<configure> and set C<DEFAULT> parameter.
+
+    Getopt::EX::Hashed->configure( DEFAULT => is => 'rw' );
 
 =item B<spec> => I<string>
 
@@ -387,7 +392,7 @@ as C<undef>.
 =item B<action> => I<coderef>
 
 Parameter C<action> takes code reference which is called to process
-the option.  When called, hash object is passed through C<$_>.
+the option.  When called, hash object is passed as C<$_>.
 
     has [ qw(left right both) ] => spec => '=i';
     has "+both" => action => sub {
@@ -444,6 +449,16 @@ Set the required regular expression pattern for the argument.
 
 Class method to get initialized hash object.
 
+=item B<optspec>
+
+Return option specification list which can be given to C<GetOptions>
+function.
+
+    GetOptions($obj->optspec)
+
+C<GetOptions> has a capability of storing values in a hash, by giving
+the hash reference as a first argument, but it is not necessary.
+
 =item B<getopt>
 
 Call C<GetOptions> function defined in caller's context with
@@ -454,12 +469,6 @@ appropriate parameters.
 is just a shortcut for:
 
     GetOptions($obj->optspec)
-
-=item B<optspec>
-
-Return option specification list which can be given to C<GetOptions>
-function.  GetOptions has a capability of storing values in a hash, by
-giving the hash reference as a first argument, but it is not expected.
 
 =item B<use_keys>
 
@@ -474,6 +483,9 @@ If you want to access arbitrary keys, unlock the object.
     use Hash::Util 'unlock_keys';
     unlock_keys %{$obj};
 
+You can change this behavior by C<configure> with C<LOCK_KEYS>
+parameter.
+
 =item B<reset>
 
 Reset the class to original state.  Because the hash object keeps all
@@ -487,6 +499,13 @@ This is almost equivalent to the next code:
 
     my $obj = Getopt::EX::Hashed->new;
     Getopt::EX::Hashed->reset;
+
+=begin comment
+
+You can change this behavior by C<configure> with C<RESET_AFTER_NEW>
+parameter.
+
+=end comment
 
 =item B<configure> B<label> => I<value>, ...
 

@@ -63,10 +63,15 @@ current value.
 
 Following parameters are available.
 
-- **is** => _ro_ | _rw_
+- **is** => `ro` | `rw`
 
-    If an `is` parameter is given, accessor method for the member,
-    read-only for _ro_ and read-write for _rw_, is generated.
+    To produce accessor method, `is` parameter is necessary.  Set the
+    value `ro` for read-only, `rw` for read-write.
+
+    If you want to make accessor for all following members, use
+    `configure` and set `DEFAULT` parameter.
+
+        Getopt::EX::Hashed->configure( DEFAULT => is => 'rw' );
 
 - **spec** => _string_
 
@@ -111,7 +116,7 @@ Following parameters are available.
 - **action** => _coderef_
 
     Parameter `action` takes code reference which is called to process
-    the option.  When called, hash object is passed through `$_`.
+    the option.  When called, hash object is passed as `$_`.
 
         has [ qw(left right both) ] => spec => '=i';
         has "+both" => action => sub {
@@ -159,6 +164,16 @@ for common rules.
 
     Class method to get initialized hash object.
 
+- **optspec**
+
+    Return option specification list which can be given to `GetOptions`
+    function.
+
+        GetOptions($obj->optspec)
+
+    `GetOptions` has a capability of storing values in a hash, by giving
+    the hash reference as a first argument, but it is not necessary.
+
 - **getopt**
 
     Call `GetOptions` function defined in caller's context with
@@ -169,12 +184,6 @@ for common rules.
     is just a shortcut for:
 
         GetOptions($obj->optspec)
-
-- **optspec**
-
-    Return option specification list which can be given to `GetOptions`
-    function.  GetOptions has a capability of storing values in a hash, by
-    giving the hash reference as a first argument, but it is not expected.
 
 - **use\_keys**
 
@@ -188,6 +197,9 @@ for common rules.
 
         use Hash::Util 'unlock_keys';
         unlock_keys %{$obj};
+
+    You can change this behavior by `configure` with `LOCK_KEYS`
+    parameter.
 
 - **reset**
 
