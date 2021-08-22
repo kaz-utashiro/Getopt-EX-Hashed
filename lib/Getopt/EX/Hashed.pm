@@ -131,21 +131,18 @@ sub new {
     my $ctx = $class ne __PACKAGE__ ? $class : caller;
     my $M = __Member__($ctx);
     my $C = __Config__($ctx);
-    my $member = $obj->{__Hash__} = {
-	map {
-	    my($key, %param) = @$_;
-	    $key => \%param;
-	} @$M
-    };
-    my $order = $obj->{__Order__} = [ map $_->[0], @$M ];
-    for my $key (@$order) {
-	my $m = $member->{$key};
-	$obj->{$key} = $m->{default};
-	if (my $is = $m->{is}) {
+    my $order = $obj->{__Order__} = [];
+    my $member = $obj->{__Hash__} = {};
+    for my $M (@$M) {
+	my($name, %param) = @$M;
+	if (my $is = $param{is}) {
 	    no strict 'refs';
-	    my $access = $C->{ACCESSOR_PREFIX} . $key;
-	    *{"$class\::$access"} = _accessor($is, $key);
+	    my $access = $C->{ACCESSOR_PREFIX} . $name;
+	    *{"$class\::$access"} = _accessor($is, $name);
 	}
+	$obj->{$name} = $param{default};
+	push @$order, $name;
+	$member->{$name} = \%param;
     }
     lock_keys %$obj if $C->{LOCK_KEYS};
     __PACKAGE__->reset if $C->{RESET_AFTER_NEW};
