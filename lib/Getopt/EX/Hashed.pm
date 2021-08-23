@@ -62,6 +62,7 @@ my %DefaultConfig = (
     GETOPT             => 'GetOptions',
     ACCESSOR_PREFIX    => '',
     DEFAULT            => undef,
+    INVALID_MSG        => \&_invalid_msg,
     );
 lock_keys %DefaultConfig;
 
@@ -72,19 +73,19 @@ sub import {
     no strict 'refs';
     push @{"$caller\::ISA"}, __PACKAGE__;
     *{"$caller\::$_"} = \&$_ for @EXPORT;
-    my $C = __Config__($caller);
-    unless (%$C) {
-	%$C = %DefaultConfig or die "something wrong!";
-	lock_keys %$C;
+    my $config = __Config__($caller);
+    unless (%$config) {
+	%$config = %DefaultConfig or die "something wrong!";
+	lock_keys %$config;
     }
 }
 
 sub configure {
     my $class = shift;
     my $ctx = $class ne __PACKAGE__ ? $class : caller;
-    my $C = __Config__($ctx);
+    my $config = __Config__($ctx);
     while (my($key, $value) = splice @_, 0, 2) {
-	$C->{$key} = $value;
+	$config->{$key} = $value;
     }
     return $class;
 }
@@ -92,12 +93,15 @@ sub configure {
 sub unimport {
     no strict 'refs';
     my $caller = caller;
-    delete ${"$caller\::"}{has};
+    delete ${"$caller\::"}{$_} for @EXPORT;
 }
 
 sub reset {
-    my $M = __Member__(caller);
-    @$M = ();
+    my $caller = caller;
+    my $member = __Member__($caller);
+    my $config = __Config__($caller);
+    @$member = ();
+    %$config = %DefaultConfig;
     return $_[0];
 }
 
@@ -105,22 +109,22 @@ sub has {
     my($key, @param) = @_;
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
     my $caller = caller;
-    my $M = __Member__($caller);
-    my $C = __Config__($caller);
+    my $member = __Member__($caller);
+    my $config = __Config__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
-	my $i = first { $M->[$_]->[0] eq $name } 0 .. $#{$M};
+	my $i = first { $member->[$_]->[0] eq $name } 0 .. $#{$member};
 	if ($append) {
 	    defined $i or die "$name: Not found\n";
-	    push @{$M->[$i]}, @param;
+	    push @{$member->[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
-	    if (my $default = $C->{DEFAULT}) {
+	    if (my $default = $config->{DEFAULT}) {
 		if (ref $default eq 'ARRAY') {
 		    unshift @param, @$default;
 		}
 	    }
-	    push @$M, [ $name, @param ];
+	    push @$member, [ $name, @param ];
 	}
     }
 }
@@ -129,24 +133,34 @@ sub new {
     my $class = shift;
     my $obj = bless {}, $class;
     my $ctx = $class ne __PACKAGE__ ? $class : caller;
-    my $M = __Member__($ctx);
-    my $C = __Config__($ctx);
-    my $order = $obj->{__Order__} = [];
-    my $member = $obj->{__Hash__} = {};
-    for my $M (@$M) {
-	my($name, %param) = @$M;
+    my $member = __Member__($ctx);
+    my $config = $obj->{__Config__} = __Config__($ctx);
+    my $order  = $obj->{__Order__} = [];
+    my $hash   = $obj->{__Hash__} = {};
+    for my $m (@$member) {
+	my($name, %param) = @$m;
 	if (my $is = $param{is}) {
 	    no strict 'refs';
-	    my $access = $C->{ACCESSOR_PREFIX} . $name;
+	    my $access = $config->{ACCESSOR_PREFIX} . $name;
 	    *{"$class\::$access"} = _accessor($is, $name);
 	}
 	$obj->{$name} = $param{default};
 	push @$order, $name;
-	$member->{$name} = \%param;
+	$hash->{$name} = \%param;
     }
-    lock_keys %$obj if $C->{LOCK_KEYS};
-    __PACKAGE__->reset if $C->{RESET_AFTER_NEW};
+    lock_keys %$obj if $config->{LOCK_KEYS};
+    __PACKAGE__->reset if $config->{RESET_AFTER_NEW};
     $obj;
+}
+
+sub _conf {
+    my $obj = shift;
+    my $config = $obj->{__Config__} or die;
+    if (@_) {
+	$config->{+shift};
+    } else {
+	$config;
+    }
 }
 
 sub _accessor {
@@ -165,14 +179,6 @@ sub _accessor {
 
 sub optspec {
     my $obj = shift;
-    my $ref = ref $obj;
-    my $ctx = $ref ne __PACKAGE__ ? $ref : caller;
-    _optspec($obj, $ctx, @_);
-}
-
-sub _optspec {
-    my $obj = shift;
-    my $ctx = shift;
     my $member = $obj->{__Hash__};
     my @spec = do {
 	# spec .= alias
@@ -193,7 +199,7 @@ sub _optspec {
     };
     my @optlist = map {
 	my($name, $spec) = @$_;
-	my $compiled = _compile($ctx, $name, $spec);
+	my $compiled = $obj->_compile($name, $spec);
 	my $m = $member->{$name};
 	my $action = $m->{action};
 	$action and ref $action ne 'CODE'
@@ -203,10 +209,7 @@ sub _optspec {
 		$action ||= \&_generic_setter;
 		sub {
 		    local $_ = $obj;
-		    &$is_valid or do {
-			local $" = ' -> ';
-			die "@_: invalid option/value.\n";
-		    };
+		    &$is_valid or die &{$obj->_conf->{INVALID_MSG}};
 		    &$action;
 		};
 	    }
@@ -223,6 +226,17 @@ sub _optspec {
 	};
 	$compiled => $dest;
     } @spec;
+}
+
+sub _invalid_msg {
+    my $opt = do {
+	if (@_ <= 2) {
+	    '--' . join '=', @_;
+	} else {
+	    sprintf "--%s %s=%s", @_[0..2];
+	}
+    };
+    "$opt: option validation error\n";
 }
 
 my %tester = (
@@ -257,7 +271,7 @@ sub _generic_setter {
 my $spec_re = qr/[!+=:]/;
 
 sub _compile {
-    my $ctx = shift;
+    my $obj = shift;
     my($name, $args) = @_;
 
     return $name if $name eq '<>';
@@ -271,10 +285,9 @@ sub _compile {
     };
     my @alias = grep !/$spec_re/, @args;
     my @names = ($name, @alias);
-    my $C = __Config__($ctx);
     for ($name, @alias) {
-	push @names, tr[_][-]r if /_/ && $C->{REPLACE_UNDERSCORE};
-	push @names, tr[_][]dr if /_/ && $C->{REMOVE_UNDERSCORE};
+	push @names, tr[_][-]r if /_/ && $obj->_conf->{REPLACE_UNDERSCORE};
+	push @names, tr[_][]dr if /_/ && $obj->_conf->{REMOVE_UNDERSCORE};
     }
     push @names, '' if @names and $spec !~ /^($spec_re|$)/;
     join('|', @names) . $spec;
@@ -282,12 +295,9 @@ sub _compile {
 
 sub getopt {
     my $obj = shift;
-    my $ref = ref $obj;
-    my $ctx = $ref ne __PACKAGE__ ? $ref : caller;
-    my $C = __Config__($ctx);
-    my $getopt = caller . "::" . $C->{GETOPT};
+    my $getopt = caller . "::" . $obj->_conf('GETOPT');
     no strict 'refs';
-    $getopt->(_optspec($obj, $ctx));
+    $getopt->($obj->optspec());
 }
 
 sub use_keys {
