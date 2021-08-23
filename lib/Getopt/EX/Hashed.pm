@@ -58,7 +58,6 @@ my %DefaultConfig = (
     LOCK_KEYS          => 1,
     REPLACE_UNDERSCORE => 1,
     REMOVE_UNDERSCORE  => 0,
-    RESET_AFTER_NEW    => 0,
     GETOPT             => 'GetOptions',
     ACCESSOR_PREFIX    => '',
     DEFAULT            => undef,
@@ -149,7 +148,6 @@ sub new {
 	$hash->{$name} = \%param;
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
-    __PACKAGE__->reset if $config->{RESET_AFTER_NEW};
     $obj;
 }
 
@@ -493,27 +491,6 @@ If you want to access arbitrary keys, unlock the object.
 You can change this behavior by C<configure> with C<LOCK_KEYS>
 parameter.
 
-=item B<reset>
-
-Reset the class to original state.  Because the hash object keeps all
-information, this does not effect to the existing object.  It returns
-the object itself, so you can reset the class after creating a object
-like this:
-
-    my $obj = Getopt::EX::Hashed->new->reset;
-
-This is almost equivalent to the next code:
-
-    my $obj = Getopt::EX::Hashed->new;
-    Getopt::EX::Hashed->reset;
-
-=begin comment
-
-You can change this behavior by C<configure> with C<RESET_AFTER_NEW>
-parameter.
-
-=end comment
-
 =item B<configure> B<label> => I<value>, ...
 
 There are following configuration parameters.
@@ -532,14 +509,6 @@ Produce alias with underscores replaced by dash.
 =item B<REMOVE_UNDERSCORE> (default: 0)
 
 Produce alias with underscores removed.
-
-=begin comment
-
-=item B<RESET_AFTER_NEW> (default: 0)
-
-Reset class information after new.
-
-=end comment
 
 =item B<GETOPT> (default: 'GetOptions')
 
@@ -564,6 +533,10 @@ following hash entries.  Declare C<< is => '' >> to reset.
     Getopt::EX::Hashed->configure(is => 'ro');
 
 =back
+
+=item B<reset>
+
+Reset the class to the original state.
 
 =back
 

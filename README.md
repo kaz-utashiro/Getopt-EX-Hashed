@@ -201,20 +201,6 @@ for common rules.
     You can change this behavior by `configure` with `LOCK_KEYS`
     parameter.
 
-- **reset**
-
-    Reset the class to original state.  Because the hash object keeps all
-    information, this does not effect to the existing object.  It returns
-    the object itself, so you can reset the class after creating a object
-    like this:
-
-        my $obj = Getopt::EX::Hashed->new->reset;
-
-    This is almost equivalent to the next code:
-
-        my $obj = Getopt::EX::Hashed->new;
-        Getopt::EX::Hashed->reset;
-
 - **configure** **label** => _value_, ...
 
     There are following configuration parameters.
@@ -253,6 +239,10 @@ for common rules.
         following hash entries.  Declare `is => ''` to reset.
 
             Getopt::EX::Hashed->configure(is => 'ro');
+
+- **reset**
+
+    Reset the class to the original state.
 
 # SEE ALSO
 
