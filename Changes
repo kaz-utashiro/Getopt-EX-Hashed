@@ -2,6 +2,11 @@ Revision history for Perl extension Getopt-EX-Hashed
 
 {{$NEXT}}
 
+0.9916 2021-08-24T03:12:10Z
+
+    - Change reset behavior.
+    - Pointer to the configuration is now stored in a object.
+
 0.9915 2021-08-22T14:50:29Z
 
     - Implementation and document refine.
