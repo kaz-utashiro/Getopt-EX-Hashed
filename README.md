@@ -203,6 +203,12 @@ for common rules.
 
 - **configure** **label** => _value_, ...
 
+    Use class method `Getopt::EX::Hashed->configure()` before
+    creating an object; this information is stored in the area unique for
+    calling package.  After calling `new()`, package unique configuration
+    is copied in the object, and it is used for further operation.  Use
+    `$obj->configure()` to update object unique configuration.
+
     There are following configuration parameters.
 
     - **LOCK\_KEYS** (default: 1)

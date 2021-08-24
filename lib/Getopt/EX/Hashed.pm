@@ -81,8 +81,14 @@ sub import {
 
 sub configure {
     my $class = shift;
-    my $ctx = $class ne __PACKAGE__ ? $class : caller;
-    my $config = __Config__($ctx);
+    my $config = do {
+	if (ref $class) {
+	    $class->_conf;
+	} else {
+	    my $ctx = $class ne __PACKAGE__ ? $class : caller;
+	    __Config__($ctx);
+	}
+    };
     while (my($key, $value) = splice @_, 0, 2) {
 	$config->{$key} = $value;
     }
@@ -134,7 +140,7 @@ sub new {
     my $ctx = $class ne __PACKAGE__ ? $class : caller;
     my $master = __Member__($ctx);
     my $member = $obj->{__Member__} = [];
-    my $config = $obj->{__Config__} = __Config__($ctx);
+    my $config = $obj->{__Config__} = { %{__Config__($ctx)} }; # make copy
     for my $m (@$master) {
 	my($name, %param) = @$m;
 	push @$member, [ $name => \%param ];
@@ -481,6 +487,12 @@ You can change this behavior by C<configure> with C<LOCK_KEYS>
 parameter.
 
 =item B<configure> B<label> => I<value>, ...
+
+Use class method C<< Getopt::EX::Hashed->configure() >> before
+creating an object; this information is stored in the area unique for
+calling package.  After calling C<new()>, package unique configuration
+is copied in the object, and it is used for further operation.  Use
+C<< $obj->configure() >> to update object unique configuration.
 
 There are following configuration parameters.
 
