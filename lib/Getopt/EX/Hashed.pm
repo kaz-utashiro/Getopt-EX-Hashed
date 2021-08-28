@@ -115,7 +115,6 @@ sub has {
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
     my $caller = caller;
     my $member = __Member__($caller);
-    my $config = __Config__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
 	my $i = first { $member->[$_]->[0] eq $name } 0 .. $#{$member};
@@ -124,6 +123,7 @@ sub has {
 	    push @{$member->[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
+	    my $config = __Config__($caller);
 	    if (my $default = $config->{DEFAULT}) {
 		if (ref $default eq 'ARRAY') {
 		    unshift @param, @$default;
