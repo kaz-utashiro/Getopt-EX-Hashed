@@ -74,6 +74,7 @@ sub import {
     *{"$caller\::$_"} = \&$_ for @EXPORT;
     my $config = __Config__($caller);
     unless (%$config) {
+	unlock_keys %$config;
 	%$config = %DefaultConfig or die "something wrong!";
 	lock_keys %$config;
     }
@@ -124,7 +125,8 @@ sub has {
 	} else {
 	    defined $i and die "$name: Duplicated\n";
 	    my $config = __Config__($caller);
-	    if (my $default = $config->{DEFAULT}) {
+	    if (exists $config->{DEFAULT} and
+		my $default = $config->{DEFAULT}) {
 		if (ref $default eq 'ARRAY') {
 		    unshift @param, @$default;
 		}
@@ -169,8 +171,8 @@ sub getopt {
 
 sub use_keys {
     my $obj = shift;
-    unlock_keys %{$obj};
-    lock_keys_plus %{$obj}, @_;
+    unlock_keys %$obj;
+    lock_keys_plus %$obj, @_;
 }
 
 sub _conf   { $_[0]->{__Config__} }
