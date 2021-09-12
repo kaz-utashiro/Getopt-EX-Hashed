@@ -113,6 +113,7 @@ sub reset {
 
 sub has {
     my($key, @param) = @_;
+    @param % 2 and unshift @param, 'spec';
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
     my $caller = caller;
     my $member = __Member__($caller);
@@ -336,6 +337,9 @@ If the name start with plus (C<+>), given parameters are added to
 current value.
 
     has '+left' => ( default => 1 );
+
+If the number of parameter is not even, first parameter is taken as
+C<spec>.
 
 Following parameters are available.
 

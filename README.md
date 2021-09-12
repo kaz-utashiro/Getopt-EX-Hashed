@@ -61,6 +61,9 @@ current value.
 
     has '+left' => ( default => 1 );
 
+If the number of parameter is not even, first parameter is taken as
+`spec`.
+
 Following parameters are available.
 
 - **is** => `ro` | `rw`
