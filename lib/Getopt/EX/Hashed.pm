@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9918';
+our $VERSION = '0.9919';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9918
+Version 0.9919
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,8 @@ sub new {
 	if (my $is = $param{is}) {
 	    no strict 'refs';
 	    my $access = $config->{ACCESSOR_PREFIX} . $name;
-	    *{"$class\::$access"} = _accessor($is, $name);
+	    *{"$class\::$access"} = _accessor($is, $name)
+		unless ${"$class\::"}{$access};
 	}
 	$obj->{$name} = $param{default};
     }
