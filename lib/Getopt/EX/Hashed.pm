@@ -42,6 +42,7 @@ use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Carp;
 use Data::Dumper;
 use List::Util qw(first);
+use Clone qw(clone);
 
 # store metadata in caller context
 my  %__DB__;
@@ -155,7 +156,7 @@ sub new {
 	    *{"$class\::$access"} = _accessor($is, $name)
 		unless ${"$class\::"}{$access};
 	}
-	$obj->{$name} = $param{default};
+	$obj->{$name} = clone $param{default};
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
     $obj;

@@ -34,7 +34,8 @@ VALID: {
 		     --nature Marvin=Paranoid
 		   );
 
-    (my $app = Getopt::EX::Hashed->new)->getopt;
+    my $app = Getopt::EX::Hashed->new;
+    $app->getopt;
 
     is($app->{answer}, 42, "Number");
     is($app->{answer_is}, "Answer is 42", "Number with action");
@@ -47,16 +48,18 @@ INVALID: {
     local @ARGV = qw(--answer 41
 		     --answer-is 41
 		     --question space
+		     --mouse Benji
 		     --nature Marvin=Sociable
 		   );
 
-    (my $app = Getopt::EX::Hashed->new)->getopt;
+    my $app = Getopt::EX::Hashed->new;
+    $app->getopt;
 
-    isnt($app->{answer}, 41, "Number");
-    isnt($app->{answer_is}, "Answer is 41", "Number with action");
-    isnt($app->{question}->[0], "space", "RE");
-    isnt($app->{mouse}, "Benji", "List");
-    isnt($app->{nature}->{Marvin}, "Sociable", "Hash");
+    is($app->{answer}, undef, "Number");
+    is($app->{answer_is}, undef, "Number with action");
+    is($app->{question}->[0], undef, "RE");
+    is($app->{mouse}, undef, "List");
+    is($app->{nature}->{Marvin}, undef, "Hash");
 }
 
 done_testing;
