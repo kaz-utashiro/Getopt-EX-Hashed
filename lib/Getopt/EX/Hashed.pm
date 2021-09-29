@@ -267,12 +267,20 @@ my %tester = (
     min  => sub { $_[-1] >= $_->{min} },
     max  => sub { $_[-1] <= $_->{max} },
     re   => sub { $_[-1] =~ $_->{re} },
-    must => sub { &{$_->{must}} },
-    any  => sub {
+    must => sub {
+	my $must = $_->{must};
+	for $_ (ref($must) eq 'ARRAY' ? @$must : $must) {
+	    &$_ or return 0;
+	}
+	return 1;
+    },
+    any => sub {
 	my $any = $_->{any};
 	for (ref($any) eq 'ARRAY' ? @$any : $any) {
 	    if (ref($_) eq 'Regexp') {
 		$_[-1] =~ $_ and return 1;
+	    } elsif (ref($_) eq 'CODE') {
+		&{$_->{must}} and return 1;
 	    } else {
 		$_[-1] eq $_ and return 1;
 	    }
@@ -442,7 +450,7 @@ for common rules.
 
 =over 7
 
-=item B<must> => I<coderef>
+=item B<must> => I<coderef> | [ I<codoref> ... ]
 
 Parameter C<must> takes a code reference to validate option values.
 It takes same arguments as C<action> and returns boolean.  With next
@@ -451,6 +459,12 @@ example, option B<--answer> takes only 42 as a valid value.
     has answer =>
         spec => '=i',
         must => sub { $_[1] == 42 };
+
+If multiple code reference is given, all code have to return true.
+
+    has answer =>
+        spec => '=i',
+        must =>[ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
 
 =item B<min> => I<number>
 

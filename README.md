@@ -146,7 +146,7 @@ Following parameters are all for data validation.  First `must` is a
 generic validator and can implement anything.  Others are shorthand
 for common rules.
 
-- **must** => _coderef_
+- **must** => _coderef_ | \[ _codoref_ ... \]
 
     Parameter `must` takes a code reference to validate option values.
     It takes same arguments as `action` and returns boolean.  With next
@@ -155,6 +155,12 @@ for common rules.
         has answer =>
             spec => '=i',
             must => sub { $_[1] == 42 };
+
+    If multiple code reference is given, all code have to return true.
+
+        has answer =>
+            spec => '=i',
+            must =>[ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
 
 - **min** => _number_
 - **max** => _number_
