@@ -42,7 +42,6 @@ use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Carp;
 use Data::Dumper;
 use List::Util qw(first);
-use Clone qw(clone);
 
 # store metadata in caller context
 my  %__DB__;
@@ -156,7 +155,10 @@ sub new {
 	    *{"$class\::$access"} = _accessor($is, $name)
 		unless ${"$class\::"}{$access};
 	}
-	$obj->{$name} = clone $param{default};
+	$obj->{$name} = do {
+	    local $_ = $param{default};
+	    (ref eq 'ARRAY') ? [ @$_ ] : (ref eq 'HASH') ? { %$_ } : $_;
+	};
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
     $obj;
@@ -419,6 +421,11 @@ There is no difference with ones in C<spec> parameter.
 
 Set default value.  If no default is given, the member is initialized
 as C<undef>.
+
+If the value is a reference for ARRAY or HASH, new reference with same
+member is assigned.  This means that member data is shared across
+multiple C<new> calls.  Please be careful if you call C<new> multiple
+times and alter the member data.
 
 =item B<action> => I<coderef>
 

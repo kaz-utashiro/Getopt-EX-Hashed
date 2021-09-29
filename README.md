@@ -120,6 +120,11 @@ Following parameters are available.
     Set default value.  If no default is given, the member is initialized
     as `undef`.
 
+    If the value is a reference for ARRAY or HASH, new reference with same
+    member is assigned.  This means that member data is shared across
+    multiple `new` calls.  Please be careful if you call `new` multiple
+    times and alter the member data.
+
 - **action** => _coderef_
 
     Parameter `action` takes code reference which is called to process
