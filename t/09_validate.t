@@ -6,25 +6,30 @@ use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 
 use Getopt::Long;
-use Getopt::EX::Hashed 'has';
 
-has answer    => '=i', min => 42, max => 42;
+use Getopt::EX::Hashed 'has'; {
 
-has answer_is => '=i', min => 42, max => 42,
-    action => sub {
-	$_->{$_[0]} = "Answer is $_[1]";
-    };
+    has answer    => '=i', min => 42, max => 42;
 
-has question => '=s@',
-    default => [],
-    any => qr/^(life|universe|everything)$/i;
+    has answer_is => '=i', min => 42, max => 42,
+	action => sub {
+	    $_->{$_[0]} = "Answer is $_[1]";
+	};
 
-has mouse => '=s',
-    any => [ qw(Frankie Benjy) ];
+    has question => '=s@',
+	default => [],
+	any => qr/^(life|universe|everything)$/i;
 
-has nature => '=s%',
-    default => {},
-    any => qr/^paranoid$/i;
+    has mouse => '=s',
+	any => [ qw(Frankie Benjy) ];
+
+    has nature => '=s%',
+	default => {},
+	any => sub {
+	    $_[1] eq 'Marvin' ? $_[2] =~ qr/^paranoid$/i : 1
+	};
+
+} no Getopt::EX::Hashed;
 
 VALID: {
     local @ARGV = qw(--answer 42
@@ -32,6 +37,7 @@ VALID: {
 		     --question life
 		     --mouse Benjy
 		     --nature Marvin=Paranoid
+		     --nature Zaphod=Sociable
 		   );
 
     my $app = Getopt::EX::Hashed->new;
@@ -42,6 +48,7 @@ VALID: {
     is($app->{question}->[0], "life", "RE");
     is($app->{mouse}, "Benjy", "List");
     is($app->{nature}->{Marvin}, "Paranoid", "Hash");
+    is($app->{nature}->{Zaphod}, "Sociable", "Hash");
 }
 
 INVALID: {
@@ -50,6 +57,7 @@ INVALID: {
 		     --question space
 		     --mouse Benji
 		     --nature Marvin=Sociable
+		     --nature Zaphod=Paranoid
 		   );
 
     my $app = Getopt::EX::Hashed->new;

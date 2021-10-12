@@ -279,10 +279,10 @@ my %tester = (
     any => sub {
 	my $any = $_->{any};
 	for (ref($any) eq 'ARRAY' ? @$any : $any) {
-	    if (ref($_) eq 'Regexp') {
+	    if (ref eq 'Regexp') {
 		$_[-1] =~ $_ and return 1;
-	    } elsif (ref($_) eq 'CODE') {
-		&{$_->{must}} and return 1;
+	    } elsif (ref eq 'CODE') {
+		&$_ and return 1;
 	    } else {
 		$_[-1] eq $_ and return 1;
 	    }
