@@ -1,5 +1,5 @@
 {
-   "abstract" : "Hash store object automation",
+   "abstract" : "Hash store object automation for Getopt::Long",
    "author" : [
       "Kazumasa Utashiro"
    ],

@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/kaz-utashiro/Getopt-EX-Hashed/workflows/test/badge.svg)](https://github.com/kaz-utashiro/Getopt-EX-Hashed/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Getopt-EX-Hashed.svg)](https://metacpan.org/release/Getopt-EX-Hashed)
 # NAME
 
-Getopt::EX::Hashed - Hash store object automation
+Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 # VERSION
 
@@ -14,15 +14,15 @@ Version 0.9920
 
     package App::foo;
 
-    use Getopt::EX::Hashed;
-    has start    => ( spec => "=i s begin", default => 1 );
-    has end      => ( spec => "=i e" );
-    has file     => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
-    has score    => ( spec => '=i', min => 0, max => 100 );
-    has answer   => ( spec => '=i', must => sub { $_[1] == 42 } );
-    has mouse    => ( spec => '=s', any => [ 'Frankie', 'Benjy' ] );
-    has question => ( spec => '=s', re => qr/^(life|universe|everything)$/i);
-    no  Getopt::EX::Hashed;
+    use Getopt::EX::Hashed; {
+        has start    => ' =i  s begin ' , default => 1;
+        has end      => ' =i  e       ' ;
+        has file     => ' =s@ f       ' , is => 'rw', any => qr/^(?!\.)/;
+        has score    => ' =i          ' , min => 0, max => 100;
+        has answer   => ' =i          ' , must => sub { $_[1] == 42 };
+        has mouse    => ' =s          ' , any => [ 'Frankie', 'Benjy' ];
+        has question => ' =s          ' , any => qr/^(life|universe|everything)$/i;
+    } no Getopt::EX::Hashed;
 
     sub run {
         my $app = shift;
@@ -34,14 +34,14 @@ Version 0.9920
 # DESCRIPTION
 
 **Getopt::EX::Hashed** is a module to automate a hash object to store
-command line option values.  Major objective of this module is
-integrating initialization and specification into single place.
-Module name shares **Getopt::EX**, but it works independently from
-other modules included in **Getopt::EX**, so far.
+command line option values for **Getopt::Long** or compatible module
+including **Getopt::EX::Long**.
 
-In the current implementation, using **Getopt::Long**, or compatible
-module such as **Getopt::EX::Long** is assumed.  It is configurable,
-but no other module is supported now.
+Major objective of this module is integrating initialization and
+specification into single place.
+
+Module name shares **Getopt::EX**, but it works independently from
+other modules in **Getopt::EX**, so far.
 
 Accessor methods are automatically generated when appropriate parameter
 is given.
@@ -58,34 +58,19 @@ If array reference is given, multiple names can be declared at once.
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
-If the number of parameter is not even, first parameter is taken as
-`spec`.  So the above example can be written as this:
-
-    has [ 'left', 'right' ] => "=i";
-
-If the name start with plus (`+`), given parameters are added to
-current value.
+If the name start with plus (`+`), given parameter updates values.
 
     has '+left' => ( default => 1 );
 
 Following parameters are available.
 
-- **is** => `ro` | `rw`
+- \[ **spec** => \] _string_
 
-    To produce accessor method, `is` parameter is necessary.  Set the
-    value `ro` for read-only, `rw` for read-write.
+    Give option specification.  `spec =>` label can be omitted if and
+    only if it is the first parameter.
 
-    If you want to make accessor for all following members, use
-    `configure` and set `DEFAULT` parameter.
-
-        Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
-
-- **spec** => _string_
-
-    Give option specification.  Option spec and alias names are separated
-    by white space, and can show up in any order.
-
-    Declaration
+    In _string_, option spec and alias names are separated by white
+    space, and can show up in any order.  Declaration
 
         has start => ( spec => "=i s begin" );
 
@@ -114,6 +99,16 @@ Following parameters are available.
 
     Additional alias names can be specified by **alias** parameter too.
     There is no difference with ones in `spec` parameter.
+
+- **is** => `ro` | `rw`
+
+    To produce accessor method, `is` parameter is necessary.  Set the
+    value `ro` for read-only, `rw` for read-write.
+
+    If you want to make accessor for all following members, use
+    `configure` and set `DEFAULT` parameter.
+
+        Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
 - **default** => _value_
 
@@ -174,7 +169,7 @@ for common rules.
 
 - **any** => _arrayref_ | qr/_regex_/
 
-    Set the valid string parameter list.  Each item is string or regex
+    Set the valid string parameter list.  Each item is a string or a regex
     reference.  The argument is valid when it is same as, or match to any
     item of the given list.  If the value is not a arrayref, it is taken
     as a single item list (regexpref usually).

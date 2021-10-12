@@ -4,7 +4,7 @@ our $VERSION = '0.9920';
 
 =head1 NAME
 
-Getopt::EX::Hashed - Hash store object automation
+Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 =head1 VERSION
 
@@ -17,15 +17,15 @@ Version 0.9920
 
   package App::foo;
 
-  use Getopt::EX::Hashed;
-  has start    => ( spec => "=i s begin", default => 1 );
-  has end      => ( spec => "=i e" );
-  has file     => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
-  has score    => ( spec => '=i', min => 0, max => 100 );
-  has answer   => ( spec => '=i', must => sub { $_[1] == 42 } );
-  has mouse    => ( spec => '=s', any => [ 'Frankie', 'Benjy' ] );
-  has question => ( spec => '=s', re => qr/^(life|universe|everything)$/i);
-  no  Getopt::EX::Hashed;
+  use Getopt::EX::Hashed; {
+      has start    => ' =i  s begin ' , default => 1;
+      has end      => ' =i  e       ' ;
+      has file     => ' =s@ f       ' , is => 'rw', any => qr/^(?!\.)/;
+      has score    => ' =i          ' , min => 0, max => 100;
+      has answer   => ' =i          ' , must => sub { $_[1] == 42 };
+      has mouse    => ' =s          ' , any => [ 'Frankie', 'Benjy' ];
+      has question => ' =s          ' , any => qr/^(life|universe|everything)$/i;
+  } no Getopt::EX::Hashed;
 
   sub run {
       my $app = shift;
@@ -334,14 +334,14 @@ __END__
 =head1 DESCRIPTION
 
 B<Getopt::EX::Hashed> is a module to automate a hash object to store
-command line option values.  Major objective of this module is
-integrating initialization and specification into single place.
-Module name shares B<Getopt::EX>, but it works independently from
-other modules included in B<Getopt::EX>, so far.
+command line option values for B<Getopt::Long> or compatible module
+including B<Getopt::EX::Long>.
 
-In the current implementation, using B<Getopt::Long>, or compatible
-module such as B<Getopt::EX::Long> is assumed.  It is configurable,
-but no other module is supported now.
+Major objective of this module is integrating initialization and
+specification into single place.
+
+Module name shares B<Getopt::EX>, but it works independently from
+other modules in B<Getopt::EX>, so far.
 
 Accessor methods are automatically generated when appropriate parameter
 is given.
@@ -358,13 +358,7 @@ If array reference is given, multiple names can be declared at once.
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
-If the number of parameter is not even, first parameter is taken as
-C<spec>.  So the above example can be written as this:
-
-    has [ 'left', 'right' ] => "=i";
-
-If the name start with plus (C<+>), given parameters are added to
-current value.
+If the name start with plus (C<+>), given parameter updates values.
 
     has '+left' => ( default => 1 );
 
@@ -372,22 +366,13 @@ Following parameters are available.
 
 =over 7
 
-=item B<is> => C<ro> | C<rw>
+=item [ B<spec> => ] I<string>
 
-To produce accessor method, C<is> parameter is necessary.  Set the
-value C<ro> for read-only, C<rw> for read-write.
+Give option specification.  C<< spec => >> label can be omitted if and
+only if it is the first parameter.
 
-If you want to make accessor for all following members, use
-C<configure> and set C<DEFAULT> parameter.
-
-    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
-
-=item B<spec> => I<string>
-
-Give option specification.  Option spec and alias names are separated
-by white space, and can show up in any order.
-
-Declaration
+In I<string>, option spec and alias names are separated by white
+space, and can show up in any order.  Declaration
 
     has start => ( spec => "=i s begin" );
 
@@ -416,6 +401,16 @@ string as a value.  Otherwise, it is not considered as an option.
 
 Additional alias names can be specified by B<alias> parameter too.
 There is no difference with ones in C<spec> parameter.
+
+=item B<is> => C<ro> | C<rw>
+
+To produce accessor method, C<is> parameter is necessary.  Set the
+value C<ro> for read-only, C<rw> for read-write.
+
+If you want to make accessor for all following members, use
+C<configure> and set C<DEFAULT> parameter.
+
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
 =item B<default> => I<value>
 
@@ -481,7 +476,7 @@ Set the minimum and maximum limit for the argument.
 
 =item B<any> => I<arrayref> | qr/I<regex>/
 
-Set the valid string parameter list.  Each item is string or regex
+Set the valid string parameter list.  Each item is a string or a regex
 reference.  The argument is valid when it is same as, or match to any
 item of the given list.  If the value is not a arrayref, it is taken
 as a single item list (regexpref usually).
