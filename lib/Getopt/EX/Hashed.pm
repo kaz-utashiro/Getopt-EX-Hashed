@@ -272,7 +272,7 @@ my %tester = (
     must => sub {
 	my $must = $_->{must};
 	for $_ (ref($must) eq 'ARRAY' ? @$must : $must) {
-	    &$_ or return 0;
+	    return 0 if not &$_;
 	}
 	return 1;
     },
@@ -280,11 +280,11 @@ my %tester = (
 	my $any = $_->{any};
 	for (ref($any) eq 'ARRAY' ? @$any : $any) {
 	    if (ref eq 'Regexp') {
-		$_[-1] =~ $_ and return 1;
+		return 1 if $_[-1] =~ $_;
 	    } elsif (ref eq 'CODE') {
-		&$_ and return 1;
+		return 1 if &$_;
 	    } else {
-		$_[-1] eq $_ and return 1;
+		return 1 if $_[-1] eq $_;
 	    }
 	}
 	return 0;
@@ -302,7 +302,7 @@ sub _validator {
     sub {
 	local $_ = $m;
 	for my $test (@test) {
-	    &$test or return 0;
+	    return 0 if not &$test;
 	}
 	return 1;
     }
