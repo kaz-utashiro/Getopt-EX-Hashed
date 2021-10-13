@@ -2,6 +2,12 @@ Revision history for Perl extension Getopt-EX-Hashed
 
 {{$NEXT}}
 
+0.9921 2021-10-13T00:26:37Z
+
+    - Allow must parameter to take multiple codes.
+    - Do not require Clone.pm
+    - Fix bug of handling coderef in any param.
+
 0.9920 2021-09-27T07:02:57Z
 
     - Introduce "any" validator.
