@@ -268,7 +268,6 @@ sub _opt_dest {
 my %tester = (
     min  => sub { $_[-1] >= $_->{min} },
     max  => sub { $_[-1] <= $_->{max} },
-    re   => sub { $_[-1] =~ $_->{re} },
     must => sub {
 	my $must = $_->{must};
 	for $_ (ref($must) eq 'ARRAY' ? @$must : $must) {
@@ -489,13 +488,6 @@ case insensitive.
 
     has question => '=s',
         any => qr/^(life|universe|everything)$/i;
-
-=item B<re> => qr/I<regex>/
-
-This parameter will be deprecated soon, because B<any> works same.
-Don't use.
-
-Set the required regular expression pattern for the argument.
 
 =back
 

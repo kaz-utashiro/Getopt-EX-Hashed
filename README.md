@@ -183,13 +183,6 @@ for common rules.
         has question => '=s',
             any => qr/^(life|universe|everything)$/i;
 
-- **re** => qr/_regex_/
-
-    This parameter will be deprecated soon, because **any** works same.
-    Don't use.
-
-    Set the required regular expression pattern for the argument.
-
 # METHOD
 
 - **new**
