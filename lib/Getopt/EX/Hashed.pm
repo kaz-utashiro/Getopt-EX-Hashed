@@ -62,7 +62,7 @@ my %DefaultConfig = (
     REMOVE_UNDERSCORE  => 0,
     GETOPT             => 'GetOptions',
     ACCESSOR_PREFIX    => '',
-    DEFAULT            => undef,
+    DEFAULT            => [],
     INVALID_MSG        => \&_invalid_msg,
     );
 lock_keys %DefaultConfig;
@@ -93,6 +93,10 @@ sub configure {
 	}
     };
     while (my($key, $value) = splice @_, 0, 2) {
+	if ($key eq 'DEFAULT') {
+	    ref($value) eq 'ARRAY' or die "DEFAULT must be arrayref";
+	    @$value % 2 == 0       or die "DEFAULT have wrong member";
+	}
 	$config->{$key} = $value;
     }
     return $class;
@@ -121,20 +125,14 @@ sub has {
     my $member = __Member__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
-	my $i = first { $member->[$_]->[0] eq $name } 0 .. $#{$member};
+	my $i = first { $member->[$_][0] eq $name } 0 .. $#{$member};
 	if ($append) {
 	    defined $i or die "$name: Not found\n";
 	    push @{$member->[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
 	    my $config = __Config__($caller);
-	    if (exists $config->{DEFAULT} and
-		my $default = $config->{DEFAULT}) {
-		if (ref $default eq 'ARRAY') {
-		    unshift @param, @$default;
-		}
-	    }
-	    push @$member, [ $name, @param ];
+	    push @$member, [ $name, @{$config->{DEFAULT}}, @param ];
 	}
     }
 }
