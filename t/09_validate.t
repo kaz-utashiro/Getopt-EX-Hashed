@@ -20,14 +20,17 @@ use Getopt::EX::Hashed 'has'; {
 	default => [],
 	any => qr/^(life|universe|everything)$/i;
 
-    has mouse => '=s',
-	any => [ qw(Frankie Benjy) ];
-
     has nature => '=s%',
 	default => {},
 	any => sub {
 	    $_[1] eq 'Marvin' ? $_[2] =~ qr/^paranoid$/i : 1
 	};
+
+    has mouse => '=s',
+	any => [ qw(Frankie Benjy) ];
+
+    has mice => ':s',
+	any => [ qw(Frankie Benjy), '' ];
 
 } no Getopt::EX::Hashed;
 
@@ -35,9 +38,10 @@ VALID: {
     local @ARGV = qw(--answer 42
 		     --answer-is 42
 		     --question life
-		     --mouse Benjy
 		     --nature Marvin=Paranoid
 		     --nature Zaphod=Sociable
+		     --mouse Benjy
+		     --mice
 		   );
 
     my $app = Getopt::EX::Hashed->new;
@@ -46,9 +50,10 @@ VALID: {
     is($app->{answer}, 42, "Number");
     is($app->{answer_is}, "Answer is 42", "Number with action");
     is($app->{question}->[0], "life", "RE");
-    is($app->{mouse}, "Benjy", "List");
     is($app->{nature}->{Marvin}, "Paranoid", "Hash");
     is($app->{nature}->{Zaphod}, "Sociable", "Hash");
+    is($app->{mouse}, "Benjy", "List");
+    is($app->{mice}, "", "List (optional)");
 }
 
 INVALID: {

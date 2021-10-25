@@ -82,6 +82,12 @@ sub import {
     }
 }
 
+sub unimport {
+    my $caller = caller;
+    no strict 'refs';
+    delete ${"$caller\::"}{$_} for @EXPORT;
+}
+
 sub configure {
     my $class = shift;
     my $config = do {
@@ -100,12 +106,6 @@ sub configure {
 	$config->{$key} = $value;
     }
     return $class;
-}
-
-sub unimport {
-    no strict 'refs';
-    my $caller = caller;
-    delete ${"$caller\::"}{$_} for @EXPORT;
 }
 
 sub reset {
