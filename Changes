@@ -2,6 +2,10 @@ Revision history for Perl extension Getopt-EX-Hashed
 
 {{$NEXT}}
 
+1.00 2021-10-25T12:46:24Z
+
+    - Version 1.00
+
 0.9922 2021-10-17T08:05:22Z
 
     - Deprecate "re" parameter.
