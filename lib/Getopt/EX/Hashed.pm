@@ -331,7 +331,7 @@ __END__
 =head1 DESCRIPTION
 
 B<Getopt::EX::Hashed> is a module to automate a hash object to store
-command line option values for B<Getopt::Long> or compatible module
+command line option values for B<Getopt::Long> and compatible modules
 including B<Getopt::EX::Long>.
 
 Major objective of this module is integrating initialization and
@@ -359,6 +359,11 @@ If the name start with plus (C<+>), given parameter updates values.
 
     has '+left' => ( default => 1 );
 
+As for C<spec> parameter, label can be omitted if it is the first
+parameter.
+
+    has left => "=i", default => 1;
+
 Following parameters are available.
 
 =over 7
@@ -371,7 +376,7 @@ only if it is the first parameter.
 In I<string>, option spec and alias names are separated by white
 space, and can show up in any order.  Declaration
 
-    has start => ( spec => "=i s begin" );
+    has start => "=i s begin";
 
 will be compiled into string:
 
@@ -380,12 +385,12 @@ will be compiled into string:
 which conform to C<Getopt::Long> definition.  Of course, you can write
 as this:
 
-    has start => ( spec => "s|begin=i" );
+    has start => "s|begin=i";
 
 If the name and aliases contain underscore (C<_>), another alias name
 is defined with dash (C<->) in place of underscores.  So
 
-    has a_to_z => ( spec => "=s" );
+    has a_to_z => "=s";
 
 will be compiled into:
 
@@ -398,6 +403,8 @@ string as a value.  Otherwise, it is not considered as an option.
 
 Additional alias names can be specified by B<alias> parameter too.
 There is no difference with ones in C<spec> parameter.
+
+    has start => "=i", alias => "s begin";
 
 =item B<is> => C<ro> | C<rw>
 
@@ -424,7 +431,7 @@ times and alter the member data.
 Parameter C<action> takes code reference which is called to process
 the option.  When called, hash object is passed as C<$_>.
 
-    has [ qw(left right both) ] => spec => '=i';
+    has [ qw(left right both) ] => '=i';
     has "+both" => action => sub {
         $_->{left} = $_->{right} = $_[1];
     };
@@ -475,7 +482,7 @@ Set the minimum and maximum limit for the argument.
 
 Set the valid string parameter list.  Each item is a string or a regex
 reference.  The argument is valid when it is same as, or match to any
-item of the given list.  If the value is not a arrayref, it is taken
+item of the given list.  If the value is not an arrayref, it is taken
 as a single item list (regexpref usually).
 
 Following declarations are almost equivalent, except second one is

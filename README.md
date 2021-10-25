@@ -34,7 +34,7 @@ Version 0.9922
 # DESCRIPTION
 
 **Getopt::EX::Hashed** is a module to automate a hash object to store
-command line option values for **Getopt::Long** or compatible module
+command line option values for **Getopt::Long** and compatible modules
 including **Getopt::EX::Long**.
 
 Major objective of this module is integrating initialization and
@@ -62,6 +62,11 @@ If the name start with plus (`+`), given parameter updates values.
 
     has '+left' => ( default => 1 );
 
+As for `spec` parameter, label can be omitted if it is the first
+parameter.
+
+    has left => "=i", default => 1;
+
 Following parameters are available.
 
 - \[ **spec** => \] _string_
@@ -72,7 +77,7 @@ Following parameters are available.
     In _string_, option spec and alias names are separated by white
     space, and can show up in any order.  Declaration
 
-        has start => ( spec => "=i s begin" );
+        has start => "=i s begin";
 
     will be compiled into string:
 
@@ -81,12 +86,12 @@ Following parameters are available.
     which conform to `Getopt::Long` definition.  Of course, you can write
     as this:
 
-        has start => ( spec => "s|begin=i" );
+        has start => "s|begin=i";
 
     If the name and aliases contain underscore (`_`), another alias name
     is defined with dash (`-`) in place of underscores.  So
 
-        has a_to_z => ( spec => "=s" );
+        has a_to_z => "=s";
 
     will be compiled into:
 
@@ -99,6 +104,8 @@ Following parameters are available.
 
     Additional alias names can be specified by **alias** parameter too.
     There is no difference with ones in `spec` parameter.
+
+        has start => "=i", alias => "s begin";
 
 - **is** => `ro` | `rw`
 
@@ -125,7 +132,7 @@ Following parameters are available.
     Parameter `action` takes code reference which is called to process
     the option.  When called, hash object is passed as `$_`.
 
-        has [ qw(left right both) ] => spec => '=i';
+        has [ qw(left right both) ] => '=i';
         has "+both" => action => sub {
             $_->{left} = $_->{right} = $_[1];
         };
@@ -171,7 +178,7 @@ for common rules.
 
     Set the valid string parameter list.  Each item is a string or a regex
     reference.  The argument is valid when it is same as, or match to any
-    item of the given list.  If the value is not a arrayref, it is taken
+    item of the given list.  If the value is not an arrayref, it is taken
     as a single item list (regexpref usually).
 
     Following declarations are almost equivalent, except second one is
