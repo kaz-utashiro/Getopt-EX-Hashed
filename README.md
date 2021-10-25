@@ -48,147 +48,153 @@ is given.
 
 # FUNCTION
 
-## **has**
+- **has**
 
-Declare option parameters in a form of:
+    Declare option parameters in a form of:
 
-    has option_name => ( param => value, ... );
+        has option_name => ( param => value, ... );
 
-If array reference is given, multiple names can be declared at once.
+    If array reference is given, multiple names can be declared at once.
 
-    has [ 'left', 'right' ] => ( spec => "=i" );
+        has [ 'left', 'right' ] => ( spec => "=i" );
 
-If the name start with plus (`+`), given parameter updates values.
+    If the name start with plus (`+`), given parameter updates values.
 
-    has '+left' => ( default => 1 );
+        has '+left' => ( default => 1 );
 
-As for `spec` parameter, label can be omitted if it is the first
-parameter.
+    As for `spec` parameter, label can be omitted if it is the first
+    parameter.
 
-    has left => "=i", default => 1;
+        has left => "=i", default => 1;
 
-Following parameters are available.
+    Following parameters are available.
 
-- \[ **spec** => \] _string_
+    - \[ **spec** => \] _string_
 
-    Give option specification.  `spec =>` label can be omitted if and
-    only if it is the first parameter.
+        Give option specification.  `spec =>` label can be omitted if and
+        only if it is the first parameter.
 
-    In _string_, option spec and alias names are separated by white
-    space, and can show up in any order.  Declaration
+        In _string_, option spec and alias names are separated by white
+        space, and can show up in any order.  Declaration
 
-        has start => "=i s begin";
+            has start => "=i s begin";
 
-    will be compiled into string:
+        will be compiled into string:
 
-        start|s|begin=i
+            start|s|begin=i
 
-    which conform to `Getopt::Long` definition.  Of course, you can write
-    as this:
+        which conform to `Getopt::Long` definition.  Of course, you can write
+        as this:
 
-        has start => "s|begin=i";
+            has start => "s|begin=i";
 
-    If the name and aliases contain underscore (`_`), another alias name
-    is defined with dash (`-`) in place of underscores.  So
+        If the name and aliases contain underscore (`_`), another alias name
+        is defined with dash (`-`) in place of underscores.  So
 
-        has a_to_z => "=s";
+            has a_to_z => "=s";
 
-    will be compiled into:
+        will be compiled into:
 
-        a_to_z|a-to-z:s
+            a_to_z|a-to-z:s
 
-    If nothing special is necessary, give empty (or white space only)
-    string as a value.  Otherwise, it is not considered as an option.
+        If nothing special is necessary, give empty (or white space only)
+        string as a value.  Otherwise, it is not considered as an option.
 
-- **alias** => _string_
+    - **alias** => _string_
 
-    Additional alias names can be specified by **alias** parameter too.
-    There is no difference with ones in `spec` parameter.
+        Additional alias names can be specified by **alias** parameter too.
+        There is no difference with ones in `spec` parameter.
 
-        has start => "=i", alias => "s begin";
+            has start => "=i", alias => "s begin";
 
-- **is** => `ro` | `rw`
+    - **is** => `ro` | `rw`
 
-    To produce accessor method, `is` parameter is necessary.  Set the
-    value `ro` for read-only, `rw` for read-write.
+        To produce accessor method, `is` parameter is necessary.  Set the
+        value `ro` for read-only, `rw` for read-write.
 
-    If you want to make accessor for all following members, use
-    `configure` and set `DEFAULT` parameter.
+        If you want to make accessor for all following members, use
+        `configure` and set `DEFAULT` parameter.
 
-        Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
+            Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
-- **default** => _value_
+    - **default** => _value_
 
-    Set default value.  If no default is given, the member is initialized
-    as `undef`.
+        Set default value.  If no default is given, the member is initialized
+        as `undef`.
 
-    If the value is a reference for ARRAY or HASH, new reference with same
-    member is assigned.  This means that member data is shared across
-    multiple `new` calls.  Please be careful if you call `new` multiple
-    times and alter the member data.
+        If the value is a reference for ARRAY or HASH, new reference with same
+        member is assigned.  This means that member data is shared across
+        multiple `new` calls.  Please be careful if you call `new` multiple
+        times and alter the member data.
 
-- **action** => _coderef_
+    - **action** => _coderef_
 
-    Parameter `action` takes code reference which is called to process
-    the option.  When called, hash object is passed as `$_`.
+        Parameter `action` takes code reference which is called to process
+        the option.  When called, hash object is passed as `$_`.
 
-        has [ qw(left right both) ] => '=i';
-        has "+both" => action => sub {
-            $_->{left} = $_->{right} = $_[1];
-        };
+            has [ qw(left right both) ] => '=i';
+            has "+both" => action => sub {
+                $_->{left} = $_->{right} = $_[1];
+            };
 
-    You can use this for `"<>"` to catch everything.  In that case,
-    spec parameter does not matter and not required.
+        You can use this for `"<>"` to catch everything.  In that case,
+        spec parameter does not matter and not required.
 
-        has ARGV => default => [];
-        has "<>" => action => sub {
-            push @{$_->{ARGV}}, $_[0];
-        };
+            has ARGV => default => [];
+            has "<>" => action => sub {
+                push @{$_->{ARGV}}, $_[0];
+            };
 
-    In fact, `default` parameter takes code reference too.  It is stored
-    in the hash object and the code works almost same.  But the hash value
-    can not be used for option storage.
+        In fact, `default` parameter takes code reference too.  It is stored
+        in the hash object and the code works almost same.  But the hash value
+        can not be used for option storage.
 
-Following parameters are all for data validation.  First `must` is a
-generic validator and can implement anything.  Others are shorthand
-for common rules.
+    Following parameters are all for data validation.  First `must` is a
+    generic validator and can implement anything.  Others are shorthand
+    for common rules.
 
-- **must** => _coderef_ | \[ _codoref_ ... \]
+    - **must** => _coderef_ | \[ _codoref_ ... \]
 
-    Parameter `must` takes a code reference to validate option values.
-    It takes same arguments as `action` and returns boolean.  With next
-    example, option **--answer** takes only 42 as a valid value.
+        Parameter `must` takes a code reference to validate option values.
+        It takes same arguments as `action` and returns boolean.  With next
+        example, option **--answer** takes only 42 as a valid value.
 
-        has answer =>
-            spec => '=i',
-            must => sub { $_[1] == 42 };
+            has answer =>
+                spec => '=i',
+                must => sub { $_[1] == 42 };
 
-    If multiple code reference is given, all code have to return true.
+        If multiple code reference is given, all code have to return true.
 
-        has answer =>
-            spec => '=i',
-            must =>[ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
+            has answer =>
+                spec => '=i',
+                must =>[ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
 
-- **min** => _number_
-- **max** => _number_
+    - **min** => _number_
+    - **max** => _number_
 
-    Set the minimum and maximum limit for the argument.
+        Set the minimum and maximum limit for the argument.
 
-- **any** => _arrayref_ | qr/_regex_/
+    - **any** => _arrayref_ | qr/_regex_/
 
-    Set the valid string parameter list.  Each item is a string or a regex
-    reference.  The argument is valid when it is same as, or match to any
-    item of the given list.  If the value is not an arrayref, it is taken
-    as a single item list (regexpref usually).
+        Set the valid string parameter list.  Each item is a string or a regex
+        reference.  The argument is valid when it is same as, or match to any
+        item of the given list.  If the value is not an arrayref, it is taken
+        as a single item list (regexpref usually).
 
-    Following declarations are almost equivalent, except second one is
-    case insensitive.
+        Following declarations are almost equivalent, except second one is
+        case insensitive.
 
-        has question => '=s',
-            any => [ 'life', 'universe', 'everything ];
+            has question => '=s',
+                any => [ 'life', 'universe', 'everything' ];
 
-        has question => '=s',
-            any => qr/^(life|universe|everything)$/i;
+            has question => '=s',
+                any => qr/^(life|universe|everything)$/i;
+
+        If you are using optional argument, don't forget to include default
+        value in the list.  Otherwise it causes validation error.
+
+            has question => ':s',
+                any => [ 'life', 'universe', 'everything', '' ];
 
 # METHOD
 

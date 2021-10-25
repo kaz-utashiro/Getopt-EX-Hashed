@@ -345,7 +345,9 @@ is given.
 
 =head1 FUNCTION
 
-=head2 B<has>
+=over 7
+
+=item B<has>
 
 Declare option parameters in a form of:
 
@@ -489,10 +491,18 @@ Following declarations are almost equivalent, except second one is
 case insensitive.
 
     has question => '=s',
-        any => [ 'life', 'universe', 'everything ];
+        any => [ 'life', 'universe', 'everything' ];
 
     has question => '=s',
         any => qr/^(life|universe|everything)$/i;
+
+If you are using optional argument, don't forget to include default
+value in the list.  Otherwise it causes validation error.
+
+    has question => ':s',
+        any => [ 'life', 'universe', 'everything', '' ];
+
+=back
 
 =back
 
