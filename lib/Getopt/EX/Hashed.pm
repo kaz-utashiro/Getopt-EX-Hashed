@@ -61,6 +61,7 @@ my %DefaultConfig = (
     REPLACE_UNDERSCORE => 1,
     REMOVE_UNDERSCORE  => 0,
     GETOPT             => 'GetOptions',
+    GETOPT_FROM_ARRAY  => 'GetOptionsFromArray',
     ACCESSOR_PREFIX    => '',
     DEFAULT            => [],
     INVALID_MSG        => \&_invalid_msg,
@@ -169,9 +170,19 @@ sub optspec {
 
 sub getopt {
     my $obj = shift;
-    my $getopt = caller . "::" . $obj->_conf->{GETOPT};
-    no strict 'refs';
-    $getopt->($obj->optspec());
+    if (@_ == 0) {
+	my $getopt = caller . "::" . $obj->_conf->{GETOPT};
+	no strict 'refs';
+	$getopt->($obj->optspec());
+    }
+    elsif (@_ == 1 and ref $_[0] eq 'ARRAY') {
+	my $getopt = caller . "::" . $obj->_conf->{GETOPT_FROM_ARRAY};
+	no strict 'refs';
+	$getopt->($_[0], $obj->optspec());
+    }
+    else {
+	die "getopt: wrong parameter.";
+    }
 }
 
 sub use_keys {
@@ -524,18 +535,22 @@ function.
 C<GetOptions> has a capability of storing values in a hash, by giving
 the hash reference as a first argument, but it is not necessary.
 
-=item B<getopt>
+=item B<getopt> [ I<arrayref> ]
 
-Call C<GetOptions> function defined in caller's context with
-appropriate parameters.
+Call appropiate function defined in caller's context to process
+options.
 
     $obj->getopt
 
-is just a shortcut for:
+    $obj->getopt(\@argv);
+
+are shortcut for:
 
     GetOptions($obj->optspec)
 
-=item B<use_keys>
+    GetOptionsFromArray(\@argv, $obj->optspec)
+
+=item B<use_keys> I<keys>
 
 Because hash keys are protected by C<Hash::Util::lock_keys>, accessing
 non-existent member causes an error.  Use this function to declare new
@@ -577,6 +592,8 @@ Produce alias with underscores replaced by dash.
 Produce alias with underscores removed.
 
 =item B<GETOPT> (default: 'GetOptions')
+
+=item B<GETOPT_FROM_ARRAY> (default: 'GetOptionsFromArray')
 
 Set function name called from C<getopt> method.
 

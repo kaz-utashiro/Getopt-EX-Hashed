@@ -5,7 +5,7 @@ use lib './t';
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 
-use Getopt::Long;
+use Getopt::Long qw(GetOptionsFromArray);
 
 use Getopt::EX::Hashed 'has'; {
 
@@ -35,18 +35,20 @@ use Getopt::EX::Hashed 'has'; {
 } no Getopt::EX::Hashed;
 
 VALID: {
-    local @ARGV = qw(--answer 42
-		     --answer-is 42
-		     --question life
-		     --nature Marvin=Paranoid
-		     --nature Zaphod=Sociable
-		     --mouse Benjy
-		     --mice
-		   );
+    my @argv = qw(--answer 42
+		  --answer-is 42
+		  --question life
+		  --nature Marvin=Paranoid
+		  --nature Zaphod=Sociable
+		  --mouse Benjy
+		  --mice
+		  -- dont panic
+		 );
 
     my $app = Getopt::EX::Hashed->new;
-    $app->getopt;
+    $app->getopt(\@argv);
 
+    is_deeply(\@argv, [ qw(dont panic) ], "non-optional parameter");
     is($app->{answer}, 42, "Number");
     is($app->{answer_is}, "Answer is 42", "Number with action");
     is($app->{question}->[0], "life", "RE");
@@ -54,25 +56,6 @@ VALID: {
     is($app->{nature}->{Zaphod}, "Sociable", "Hash");
     is($app->{mouse}, "Benjy", "List");
     is($app->{mice}, "", "List (optional)");
-}
-
-INVALID: {
-    local @ARGV = qw(--answer 41
-		     --answer-is 41
-		     --question space
-		     --mouse Benji
-		     --nature Marvin=Sociable
-		     --nature Zaphod=Paranoid
-		   );
-
-    my $app = Getopt::EX::Hashed->new;
-    $app->getopt;
-
-    is($app->{answer}, undef, "Number");
-    is($app->{answer_is}, undef, "Number with action");
-    is($app->{question}->[0], undef, "RE");
-    is($app->{mouse}, undef, "List");
-    is($app->{nature}->{Marvin}, undef, "Hash");
 }
 
 done_testing;

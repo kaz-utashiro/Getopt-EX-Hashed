@@ -212,18 +212,22 @@ is given.
     `GetOptions` has a capability of storing values in a hash, by giving
     the hash reference as a first argument, but it is not necessary.
 
-- **getopt**
+- **getopt** \[ _arrayref_ \]
 
-    Call `GetOptions` function defined in caller's context with
-    appropriate parameters.
+    Call appropiate function defined in caller's context to process
+    options.
 
         $obj->getopt
 
-    is just a shortcut for:
+        $obj->getopt(\@argv);
+
+    are shortcut for:
 
         GetOptions($obj->optspec)
 
-- **use\_keys**
+        GetOptionsFromArray(\@argv, $obj->optspec)
+
+- **use\_keys** _keys_
 
     Because hash keys are protected by `Hash::Util::lock_keys`, accessing
     non-existent member causes an error.  Use this function to declare new
@@ -263,6 +267,7 @@ is given.
         Produce alias with underscores removed.
 
     - **GETOPT** (default: 'GetOptions')
+    - **GETOPT\_FROM\_ARRAY** (default: 'GetOptionsFromArray')
 
         Set function name called from `getopt` method.
 
