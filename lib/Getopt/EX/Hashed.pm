@@ -120,7 +120,10 @@ sub reset {
 
 sub has {
     my($key, @param) = @_;
-    @param % 2 and unshift @param, 'spec';
+    if (@param % 2) {
+	my $default = ref $param[0] eq 'CODE' ? 'action' : 'spec';
+	unshift @param, $default;
+    }
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
     my $caller = caller;
     my $member = __Member__($caller);
@@ -377,6 +380,10 @@ parameter.
 
     has left => "=i", default => 1;
 
+If the number of parameter is not even, default label is assumed to be
+exist at the head: C<action> if the first parameter is code reference,
+C<spec> otherwise.
+
 Following parameters are available.
 
 =over 7
@@ -439,10 +446,13 @@ member is assigned.  This means that member data is shared across
 multiple C<new> calls.  Please be careful if you call C<new> multiple
 times and alter the member data.
 
-=item B<action> => I<coderef>
+=item [ B<action> => ] I<coderef>
 
 Parameter C<action> takes code reference which is called to process
-the option.  When called, hash object is passed as C<$_>.
+the option.  C<< action => >> label can be omitted if and only if it
+is the first parameter.
+
+When called, hash object is passed as C<$_>.
 
     has [ qw(left right both) ] => '=i';
     has "+both" => action => sub {

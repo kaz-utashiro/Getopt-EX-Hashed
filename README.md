@@ -67,6 +67,10 @@ is given.
 
         has left => "=i", default => 1;
 
+    If the number of parameter is not even, default label is assumed to be
+    exist at the head: `action` if the first parameter is code reference,
+    `spec` otherwise.
+
     Following parameters are available.
 
     - \[ **spec** => \] _string_
@@ -127,10 +131,13 @@ is given.
         multiple `new` calls.  Please be careful if you call `new` multiple
         times and alter the member data.
 
-    - **action** => _coderef_
+    - \[ **action** => \] _coderef_
 
         Parameter `action` takes code reference which is called to process
-        the option.  When called, hash object is passed as `$_`.
+        the option.  `action =>` label can be omitted if and only if it
+        is the first parameter.
+
+        When called, hash object is passed as `$_`.
 
             has [ qw(left right both) ] => '=i';
             has "+both" => action => sub {
