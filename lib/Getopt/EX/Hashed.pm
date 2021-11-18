@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
