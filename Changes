@@ -2,6 +2,10 @@ Revision history for Perl extension Getopt-EX-Hashed
 
 {{$NEXT}}
 
+1.03 2021-11-19T03:28:35Z
+
+    - Make "default" parameter to take coderef for lazy evaluation.
+
 1.02 2021-11-18T05:07:22Z
 
     - When the number of parameter is not even, first parameter is
