@@ -121,7 +121,7 @@ is given.
 
             Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
-    - **default** => _value_
+    - **default** => _value_ | _coderef_
 
         Set default value.  If no default is given, the member is initialized
         as `undef`.
@@ -130,6 +130,11 @@ is given.
         member is assigned.  This means that member data is shared across
         multiple `new` calls.  Please be careful if you call `new` multiple
         times and alter the member data.
+
+        If a code reference is given, it is called at the time of **new** to
+        get default value.  This is effective when you want to evaluate the
+        value at the time of execution, rather than declaration.  Use
+        **action** parameter to define a default action.
 
     - \[ **action** => \] _coderef_
 
@@ -152,15 +157,11 @@ is given.
                 push @{$_->{ARGV}}, $_[0];
             };
 
-        In fact, `default` parameter takes code reference too.  It is stored
-        in the hash object and the code works almost same.  But the hash value
-        can not be used for option storage.
-
     Following parameters are all for data validation.  First `must` is a
     generic validator and can implement anything.  Others are shorthand
     for common rules.
 
-    - **must** => _coderef_ | \[ _codoref_ ... \]
+    - **must** => _coderef_ | \[ _coderef_ ... \]
 
         Parameter `must` takes a code reference to validate option values.
         It takes same arguments as `action` and returns boolean.  With next

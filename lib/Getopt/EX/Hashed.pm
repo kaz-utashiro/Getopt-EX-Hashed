@@ -159,7 +159,10 @@ sub new {
 	}
 	$obj->{$name} = do {
 	    local $_ = $param{default};
-	    (ref eq 'ARRAY') ? [ @$_ ] : (ref eq 'HASH') ? { %$_ } : $_;
+	    if    (ref eq 'ARRAY') {  [ @$_ ]  }
+	    elsif (ref eq 'HASH' ) { ({ %$_ }) }
+	    elsif (ref eq 'CODE' ) {  $_->()   }
+	    else                   {  $_       }
 	};
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
@@ -436,7 +439,7 @@ C<configure> and set C<DEFAULT> parameter.
 
     Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
-=item B<default> => I<value>
+=item B<default> => I<value> | I<coderef>
 
 Set default value.  If no default is given, the member is initialized
 as C<undef>.
@@ -445,6 +448,11 @@ If the value is a reference for ARRAY or HASH, new reference with same
 member is assigned.  This means that member data is shared across
 multiple C<new> calls.  Please be careful if you call C<new> multiple
 times and alter the member data.
+
+If a code reference is given, it is called at the time of B<new> to
+get default value.  This is effective when you want to evaluate the
+value at the time of execution, rather than declaration.  Use
+B<action> parameter to define a default action.
 
 =item [ B<action> => ] I<coderef>
 
@@ -467,10 +475,6 @@ spec parameter does not matter and not required.
         push @{$_->{ARGV}}, $_[0];
     };
 
-In fact, C<default> parameter takes code reference too.  It is stored
-in the hash object and the code works almost same.  But the hash value
-can not be used for option storage.
-
 =back
 
 Following parameters are all for data validation.  First C<must> is a
@@ -479,7 +483,7 @@ for common rules.
 
 =over 7
 
-=item B<must> => I<coderef> | [ I<codoref> ... ]
+=item B<must> => I<coderef> | [ I<coderef> ... ]
 
 Parameter C<must> takes a code reference to validate option values.
 It takes same arguments as C<action> and returns boolean.  With next
