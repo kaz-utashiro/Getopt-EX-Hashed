@@ -211,6 +211,10 @@ sub _accessor {
 	rw => sub {
 	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
 	    $_[0]->{$name};
+	},
+	lv => sub :lvalue {
+	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
+	    $_[0]->{$name};
 	}
     }->{$is} or die "$name has invalid 'is' parameter.\n";
 }
@@ -429,10 +433,11 @@ There is no difference with ones in C<spec> parameter.
 
     has start => "=i", alias => "s begin";
 
-=item B<is> => C<ro> | C<rw>
+=item B<is> => C<ro> | C<rw> | C<lv>
 
 To produce accessor method, C<is> parameter is necessary.  Set the
-value C<ro> for read-only, C<rw> for read-write.
+value C<ro> for read-only, C<rw> for read-write.  If C<lv> is given,
+that member is read-write and can be assigned as lvalue.
 
 If you want to make accessor for all following members, use
 C<configure> and set C<DEFAULT> parameter.

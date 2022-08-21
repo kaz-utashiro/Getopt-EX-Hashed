@@ -111,10 +111,11 @@ is given.
 
             has start => "=i", alias => "s begin";
 
-    - **is** => `ro` | `rw`
+    - **is** => `ro` | `rw` | `lv`
 
         To produce accessor method, `is` parameter is necessary.  Set the
-        value `ro` for read-only, `rw` for read-write.
+        value `ro` for read-only, `rw` for read-write.  If `lv` is given,
+        that member is read-write and can be assigned as lvalue.
 
         If you want to make accessor for all following members, use
         `configure` and set `DEFAULT` parameter.
@@ -145,7 +146,7 @@ is given.
         When called, hash object is passed as `$_`.
 
             has [ qw(left right both) ] => '=i';
-            has "+both" => action => sub {
+            has "+both" => sub {
                 $_->{left} = $_->{right} = $_[1];
             };
 
@@ -153,12 +154,12 @@ is given.
         spec parameter does not matter and not required.
 
             has ARGV => default => [];
-            has "<>" => action => sub {
+            has "<>" => sub {
                 push @{$_->{ARGV}}, $_[0];
             };
 
     Following parameters are all for data validation.  First `must` is a
-    generic validator and can implement anything.  Others are shorthand
+    generic validator and can implement anything.  Others are shortcut
     for common rules.
 
     - **must** => _coderef_ | \[ _coderef_ ... \]
@@ -303,9 +304,9 @@ is given.
 
 # SEE ALSO
 
-[Getopt::Long](https://metacpan.org/pod/Getopt::Long)
+[Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong)
 
-[Getopt::EX](https://metacpan.org/pod/Getopt::EX), [Getopt::EX::Long](https://metacpan.org/pod/Getopt::EX::Long)
+[Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX), [Getopt::EX::Long](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3ALong)
 
 # AUTHOR
 
@@ -317,7 +318,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021 Kazumasa Utashiro
+Copyright 2021-2022 Kazumasa Utashiro
 
 # LICENSE
 
