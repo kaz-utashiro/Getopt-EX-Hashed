@@ -463,7 +463,7 @@ is the first parameter.
 When called, hash object is passed as C<$_>.
 
     has [ qw(left right both) ] => '=i';
-    has "+both" => action => sub {
+    has "+both" => sub {
         $_->{left} = $_->{right} = $_[1];
     };
 
@@ -471,14 +471,14 @@ You can use this for C<< "<>" >> to catch everything.  In that case,
 spec parameter does not matter and not required.
 
     has ARGV => default => [];
-    has "<>" => action => sub {
+    has "<>" => sub {
         push @{$_->{ARGV}}, $_[0];
     };
 
 =back
 
 Following parameters are all for data validation.  First C<must> is a
-generic validator and can implement anything.  Others are shorthand
+generic validator and can implement anything.  Others are shortcut
 for common rules.
 
 =over 7
@@ -653,7 +653,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021 Kazumasa Utashiro
+Copyright 2021-2022 Kazumasa Utashiro
 
 =head1 LICENSE
 
