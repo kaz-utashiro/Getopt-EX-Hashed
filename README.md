@@ -111,16 +111,28 @@ is given.
 
             has start => "=i", alias => "s begin";
 
-    - **is** => `ro` | `rw` | `lv`
+    - **is** => `ro` | `rw`
 
         To produce accessor method, `is` parameter is necessary.  Set the
-        value `ro` for read-only, `rw` for read-write.  If `lv` is given,
-        that member is read-write and can be assigned as lvalue.
+        value `ro` for read-only, `rw` for read-write.
+
+        Read-write accessor has a lvalue attribute, so it can be assigned.
+        You can use like this:
+
+            $app->foo //= 1;
+
+        which is simpler than:
+
+            $app->foo(1) unless defined $app->foo;
 
         If you want to make accessor for all following members, use
-        `configure` and set `DEFAULT` parameter.
+        `configure` to set `DEFAULT` parameter.
 
             Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
+
+        If you don't like assignable accessor, configure `ACCESSOR_LVALUE`
+        parameter to 0.  Because accessor is generated at the time of `new`,
+        this value is effective for all members.
 
     - **default** => _value_ | _coderef_
 
@@ -223,7 +235,7 @@ is given.
 
 - **getopt** \[ _arrayref_ \]
 
-    Call appropiate function defined in caller's context to process
+    Call appropriate function defined in caller's context to process
     options.
 
         $obj->getopt
@@ -280,11 +292,16 @@ is given.
 
         Set function name called from `getopt` method.
 
-    - **ACCESSOR\_PREFIX**
+    - **ACCESSOR\_PREFIX** (default: '')
 
         When specified, it is prepended to the member name to make accessor
         method.  If `ACCESSOR_PREFIX` is defined as `opt_`, accessor for
         member `file` will be `opt_file`.
+
+    - **ACCESSOR\_LVALUE** (default: 1)
+
+        If true, read-write accessors have lvalue attribute.  Set zero if you
+        don't like that behavior.
 
     - **DEFAULT**
 
