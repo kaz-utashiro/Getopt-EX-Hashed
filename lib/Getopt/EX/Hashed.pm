@@ -386,9 +386,7 @@ is given.
 
 =head1 FUNCTION
 
-=over 7
-
-=item B<has>
+=head2 B<has>
 
 Declare option parameters in a form of:
 
@@ -566,17 +564,13 @@ value in the list.  Otherwise it causes validation error.
 
 =back
 
-=back
-
 =head1 METHOD
 
-=over 7
-
-=item B<new>
+=head2 B<new>
 
 Class method to get initialized hash object.
 
-=item B<optspec>
+=head2 B<optspec>
 
 Return option specification list which can be given to C<GetOptions>
 function.
@@ -586,7 +580,7 @@ function.
 C<GetOptions> has a capability of storing values in a hash, by giving
 the hash reference as a first argument, but it is not necessary.
 
-=item B<getopt> [ I<arrayref> ]
+=head2 B<getopt> [ I<arrayref> ]
 
 Call appropriate function defined in caller's context to process
 options.
@@ -601,7 +595,7 @@ are shortcut for:
 
     GetOptionsFromArray(\@argv, $obj->optspec)
 
-=item B<use_keys> I<keys>
+=head2 B<use_keys> I<keys>
 
 Because hash keys are protected by C<Hash::Util::lock_keys>, accessing
 non-existent member causes an error.  Use this function to declare new
@@ -617,7 +611,7 @@ If you want to access arbitrary keys, unlock the object.
 You can change this behavior by C<configure> with C<LOCK_KEYS>
 parameter.
 
-=item B<configure> B<label> => I<value>, ...
+=head2 B<configure> B<label> => I<value>, ...
 
 Use class method C<< Getopt::EX::Hashed->configure() >> before
 creating an object; this information is stored in the area unique for
@@ -673,11 +667,9 @@ following hash entries.  Declare C<< DEFAULT => [] >> to reset.
 
 =back
 
-=item B<reset>
+=head2 B<reset>
 
 Reset the class to the original state.
-
-=back
 
 =head1 SEE ALSO
 
