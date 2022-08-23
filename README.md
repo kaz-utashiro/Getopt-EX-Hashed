@@ -116,8 +116,8 @@ Following parameters are available.
     To produce accessor method, `is` parameter is necessary.  Set the
     value `ro` for read-only, `rw` for read-write.
 
-    Read-write accessor has a lvalue attribute, so it can be assigned.
-    You can use like this:
+    Read-write accessor has lvalue attribute, so it can be assigned.  You
+    can use like this:
 
         $app->foo //= 1;
 
@@ -180,15 +180,13 @@ for common rules.
     It takes same arguments as `action` and returns boolean.  With next
     example, option **--answer** takes only 42 as a valid value.
 
-        has answer =>
-            spec => '=i',
+        has answer => '=i',
             must => sub { $_[1] == 42 };
 
     If multiple code reference is given, all code have to return true.
 
-        has answer =>
-            spec => '=i',
-            must =>[ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
+        has answer => '=i',
+            must => [ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
 
 - **min** => _number_
 - **max** => _number_

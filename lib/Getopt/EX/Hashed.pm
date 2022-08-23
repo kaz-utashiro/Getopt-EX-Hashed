@@ -155,8 +155,10 @@ sub new {
 	if (my $is = $param{is}) {
 	    no strict 'refs';
 	    my $access = $config->{ACCESSOR_PREFIX} . $name;
-	    *{"$class\::$access"} = _accessor($is, $name, $config->{ACCESSOR_LVALUE})
-		unless ${"$class\::"}{$access};
+	    unless (${"$class\::"}{$access}) {
+		$is = 'lv' if $config->{ACCESSOR_LVALUE} && $is eq 'rw';
+		*{"$class\::$access"} = _accessor($is, $name);
+	    }
 	}
 	$obj->{$name} = do {
 	    local $_ = $param{default};
@@ -203,25 +205,6 @@ sub _conf   { $_[0]->{__Config__} }
 sub _member { $_[0]->{__Member__} }
 
 sub _accessor {
-    my($is, $name, $lvalue) = @_;
-    $is = 'lv' if $lvalue && $is eq 'rw';
-    {
-	ro => sub {
-	    $#_ and die "$name is readonly\n";
-	    $_[0]->{$name};
-	},
-	rw => sub {
-	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
-	    $_[0]->{$name};
-	},
-	lv => sub :lvalue {
-	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
-	    $_[0]->{$name};
-	},
-    }->{$is} or die "$name has invalid 'is' parameter.\n";
-}
-
-sub __accessor {
     my($is, $name) = @_;
     {
 	ro => sub {
@@ -235,7 +218,7 @@ sub __accessor {
 	lv => sub :lvalue {
 	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
 	    $_[0]->{$name};
-	}
+	},
     }->{$is} or die "$name has invalid 'is' parameter.\n";
 }
 
@@ -456,8 +439,8 @@ There is no difference with ones in C<spec> parameter.
 To produce accessor method, C<is> parameter is necessary.  Set the
 value C<ro> for read-only, C<rw> for read-write.
 
-Read-write accessor has a lvalue attribute, so it can be assigned.
-You can use like this:
+Read-write accessor has lvalue attribute, so it can be assigned.  You
+can use like this:
 
     $app->foo //= 1;
 
@@ -524,15 +507,13 @@ Parameter C<must> takes a code reference to validate option values.
 It takes same arguments as C<action> and returns boolean.  With next
 example, option B<--answer> takes only 42 as a valid value.
 
-    has answer =>
-        spec => '=i',
+    has answer => '=i',
         must => sub { $_[1] == 42 };
 
 If multiple code reference is given, all code have to return true.
 
-    has answer =>
-        spec => '=i',
-        must =>[ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
+    has answer => '=i',
+        must => [ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
 
 =item B<min> => I<number>
 
