@@ -9,15 +9,18 @@ Version 1.0501
 
 # SYNOPSIS
 
+    # script/foo
     use App::foo;
     App::foo->new->run();
 
+    # lib/App/foo.pm
     package App::foo;
 
     use Getopt::EX::Hashed; {
+        Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
         has start    => ' =i  s begin ' , default => 1;
         has end      => ' =i  e       ' ;
-        has file     => ' =s@ f       ' , is => 'rw', any => qr/^(?!\.)/;
+        has file     => ' =s@ f       ' , any => qr/^(?!\.)/;
         has score    => ' =i          ' , min => 0, max => 100;
         has answer   => ' =i          ' , must => sub { $_[1] == 42 };
         has mouse    => ' =s          ' , any => [ 'Frankie', 'Benjy' ];
@@ -28,7 +31,8 @@ Version 1.0501
         my $app = shift;
         use Getopt::Long;
         $app->getopt or pod2usage();
-        if ($app->{start}) {
+        if ($app->answer == 42) {
+            $app->question //= 'life';
             ...
 
 # DESCRIPTION
@@ -99,7 +103,7 @@ Following parameters are available.
 
     will be compiled into:
 
-        a_to_z|a-to-z:s
+        a_to_z|a-to-z=s
 
     If nothing special is necessary, give empty (or white space only)
     string as a value.  Otherwise, it is not considered as an option.
