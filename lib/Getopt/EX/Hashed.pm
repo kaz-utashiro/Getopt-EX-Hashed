@@ -50,14 +50,13 @@ use List::Util qw(first);
 # store metadata in caller context
 my  %__DB__;
 sub  __DB__ {
-    $__DB__{$_[0]} //= do {
-	no strict 'refs';
-	state $sub = __PACKAGE__ =~ s/::/_/gr;
-	\%{"$_[0]\::$sub\::__DB__"};
-    };
+    my $caller = shift;
+    state $pkg = __PACKAGE__ =~ s/::/_/gr;
+    no strict 'refs';
+    $__DB__{$caller} //= \%{"$caller\::$pkg\::__DB__"};
 }
-sub __Member__ { __DB__(@_)->{Member} //= [] }
-sub __Config__ { __DB__(@_)->{Config} //= {} }
+sub __Member__ { __DB__($_[0])->{Member} //= [] }
+sub __Config__ { __DB__($_[0])->{Config} //= {} }
 
 my %DefaultConfig = (
     DEBUG_PRINT        => 0,
@@ -158,10 +157,10 @@ sub new {
 	push @$member, [ $name => \%param ];
 	if (my $is = $param{is}) {
 	    no strict 'refs';
-	    my $access = $config->{ACCESSOR_PREFIX} . $name;
-	    unless (${"$class\::"}{$access}) {
-		$is = 'lv' if $config->{ACCESSOR_LVALUE} && $is eq 'rw';
-		*{"$class\::$access"} = _accessor($is, $name);
+	    my $sub = "$class\::" . $config->{ACCESSOR_PREFIX} . $name;
+	    if (not defined &$sub) {
+		$is = 'lv' if $is eq 'rw' && $config->{ACCESSOR_LVALUE};
+		*$sub = _accessor($is, $name);
 	    }
 	}
 	$obj->{$name} = do {
@@ -212,15 +211,15 @@ sub _accessor {
     my($is, $name) = @_;
     {
 	ro => sub {
-	    $#_ and die "$name is readonly\n";
+	    @_ > 1 and die "$name is readonly\n";
 	    $_[0]->{$name};
 	},
 	rw => sub {
-	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
+	    @_ > 1 and do { $_[0]->{$name} = $_[1]; return $_[0] };
 	    $_[0]->{$name};
 	},
 	lv => sub :lvalue {
-	    $#_ and do { $_[0]->{$name} = $_[1]; return $_[0] };
+	    @_ > 1 and do { $_[0]->{$name} = $_[1]; return $_[0] };
 	    $_[0]->{$name};
 	},
     }->{$is} or die "$name has invalid 'is' parameter.\n";
@@ -443,8 +442,8 @@ There is no difference with ones in C<spec> parameter.
 To produce accessor method, C<is> parameter is necessary.  Set the
 value C<ro> for read-only, C<rw> for read-write.
 
-Read-write accessor has lvalue attribute, so it can be assigned.  You
-can use like this:
+Read-write accessor has lvalue attribute, so it can be assigned to.
+You can use like this:
 
     $app->foo //= 1;
 

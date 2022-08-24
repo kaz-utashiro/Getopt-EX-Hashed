@@ -120,8 +120,8 @@ Following parameters are available.
     To produce accessor method, `is` parameter is necessary.  Set the
     value `ro` for read-only, `rw` for read-write.
 
-    Read-write accessor has lvalue attribute, so it can be assigned.  You
-    can use like this:
+    Read-write accessor has lvalue attribute, so it can be assigned to.
+    You can use like this:
 
         $app->foo //= 1;
 
