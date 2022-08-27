@@ -155,6 +155,7 @@ sub new {
     for my $m (@$master) {
 	my($name, %param) = @$m;
 	push @$member, [ $name => \%param ];
+	next if $name eq '<>';
 	if (my $is = $param{is}) {
 	    no strict 'refs';
 	    my $sub = "$class\::" . $config->{ACCESSOR_PREFIX} . $name;
@@ -174,6 +175,18 @@ sub new {
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
     $obj;
+}
+
+sub DESTROY {
+    my $obj = shift;
+    my $pkg = ref $obj;
+    my $hash = do { no strict 'refs'; \%{"$pkg\::"} };
+    my $prefix = $obj->_conf->{ACCESSOR_PREFIX};
+    for (@{ $obj->_member }) {
+	next unless $_->[1]->{is};
+	my $name = $prefix . $_->[0];
+	delete $hash->{$name} if exists $hash->{$name};
+    }
 }
 
 sub optspec {
