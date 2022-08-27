@@ -158,10 +158,11 @@ sub new {
 	if (my $is = $param{is}) {
 	    no strict 'refs';
 	    my $sub = "$class\::" . $config->{ACCESSOR_PREFIX} . $name;
-	    if (not defined &$sub) {
-		$is = 'lv' if $is eq 'rw' && $config->{ACCESSOR_LVALUE};
-		*$sub = _accessor($is, $name);
+	    if (defined &$sub) {
+		croak "&$sub already exists.\n";
 	    }
+	    $is = 'lv' if $is eq 'rw' && $config->{ACCESSOR_LVALUE};
+	    *$sub = _accessor($is, $name);
 	}
 	$obj->{$name} = do {
 	    local $_ = $param{default};
