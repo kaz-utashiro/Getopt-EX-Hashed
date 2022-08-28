@@ -39,16 +39,17 @@ Version 1.0502
 
 **Getopt::EX::Hashed** is a module to automate a hash object to store
 command line option values for **Getopt::Long** and compatible modules
-including **Getopt::EX::Long**.
+including **Getopt::EX::Long**.  Module name shares **Getopt::EX**, but
+it works independently from other modules in **Getopt::EX**, so far.
 
 Major objective of this module is integrating initialization and
-specification into single place.
+specification into single place.  It also provides simple validation
+interface.
 
-Module name shares **Getopt::EX**, but it works independently from
-other modules in **Getopt::EX**, so far.
-
-Accessor methods are automatically generated when appropriate parameter
-is given.
+Accessor methods are automatically generated when `is` parameter is
+given.  If the same function is already defined, the program causes
+fatal error.  Accessors are removed when the object is destroyed.
+Problems may occur when multiple objects are present at the same time.
 
 # FUNCTION
 

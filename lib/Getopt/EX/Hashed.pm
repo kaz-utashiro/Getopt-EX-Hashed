@@ -373,16 +373,17 @@ __END__
 
 B<Getopt::EX::Hashed> is a module to automate a hash object to store
 command line option values for B<Getopt::Long> and compatible modules
-including B<Getopt::EX::Long>.
+including B<Getopt::EX::Long>.  Module name shares B<Getopt::EX>, but
+it works independently from other modules in B<Getopt::EX>, so far.
 
 Major objective of this module is integrating initialization and
-specification into single place.
+specification into single place.  It also provides simple validation
+interface.
 
-Module name shares B<Getopt::EX>, but it works independently from
-other modules in B<Getopt::EX>, so far.
-
-Accessor methods are automatically generated when appropriate parameter
-is given.
+Accessor methods are automatically generated when C<is> parameter is
+given.  If the same function is already defined, the program causes
+fatal error.  Accessors are removed when the object is destroyed.
+Problems may occur when multiple objects are present at the same time.
 
 =head1 FUNCTION
 
