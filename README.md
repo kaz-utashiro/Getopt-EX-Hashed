@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 # VERSION
 
-Version 1.0502
+Version 1.0503
 
 # SYNOPSIS
 
