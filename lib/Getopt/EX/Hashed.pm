@@ -309,7 +309,7 @@ my %tester = (
     max  => sub { $_[-1] <= $_->{max} },
     must => sub {
 	my $must = $_->{must};
-	for $_ (ref($must) eq 'ARRAY' ? @$must : $must) {
+	for (ref($must) eq 'ARRAY' ? @$must : $must) {
 	    return 0 if not &$_;
 	}
 	return 1;
