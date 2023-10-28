@@ -133,7 +133,7 @@ sub has {
     my $member = __Member__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
-	my $i = first { $member->[$_][0] eq $name } 0 .. $#{$member};
+	my $i = first { $member->[$_][0] eq $name } keys @$member;
 	if ($append) {
 	    defined $i or die "$name: Not found\n";
 	    push @{$member->[$i]}, @param;
