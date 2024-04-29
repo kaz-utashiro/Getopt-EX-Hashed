@@ -24,18 +24,22 @@ else
   POD      := $(PM:.pm=.pod)
 endif
 
+LANGPART = $(if $(XENGINES),$(engin)-$(lang),$(lang))
+
 SRC_DIR  :=
 SRC      := $(POD:%=$(if $(SRC_DIR),$(SRC_DIR)/,)%)
 NAMES    := $(POD:%=$(notdir %))
-PODS     := $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(SRC:.pod=.$(if $(XENGINES),$(engin)-,)$(lang).pod)))
-MDS      := $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(NAMES:.pod=.$(if $(XENGINES),$(engin)-,)$(lang).md)))
-READMES  := $(foreach engin,$(ENGINES),$(RM_LANGS:%=../README.$(if $(XENGINES),$(engin)-)%.md))
+PODS     := $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(SRC:.pod=.$(LANGPART).pod)))
+MDS      := $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(NAMES:.pod=.$(LANGPART).md)))
+READMES  := $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),../README.$(LANGPART).md))
 ###########
 # Translate only JA by gpt-4
 #----------
-PODS     += $(foreach engin,$(XENGINES),$(foreach lang,$(XLANGS),$(SRC:.pod=.$(engin)-$(lang).pod)))
-MDS      += $(foreach engin,$(XENGINES),$(foreach lang,$(XLANGS),$(NAMES:.pod=.$(engin)-$(lang).md)))
-READMES  += $(foreach engin,$(XENGINES),$(XLANGS:%=../README.$(engin)-%.md))
+ifneq ($(XENGINES),)
+PODS     += $(foreach engin,$(XENGINES),$(foreach lang,$(XLANGS),$(SRC:.pod=.$(LANGPART).pod)))
+MDS      += $(foreach engin,$(XENGINES),$(foreach lang,$(XLANGS),$(NAMES:.pod=.$(LANGPART).md)))
+READMES  := $(foreach engin,$(XENGINES),$(foreach lang,$(LANGS),../README.$(LANGPART).md))
+endif
 ###########
 ALL      := $(PODS) $(MDS) README.md $(READMES)
 
@@ -69,7 +73,7 @@ deepl_JA_FILTER := $(GREPLE) -Mperl -Msubst::desumasu \
 	--$(deepl_JA_FORM) 
 
 define LANG_POD
-  $(SRCPATH)%.$(if $(XENGINES),$2-)$1.pod: $(SRCPATH)%.pod Makefile
+  $(SRCPATH)%.$(LANGPART).pod: $(SRCPATH)%.pod Makefile
   ifdef $2_$1_FILTER
 	$$(XLATE) -e $2 -t $1 $$< | $$($2_$1_FILTER) > $$@
   else
@@ -84,7 +88,7 @@ $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(eval $(call LANG_POD,$(lang
 	pod2markdown $< > $@
 
 define LANG_README
-  ../README.$(if $(XENGINES),$2-,)$1.md: $(MOD_NAME).$(if $(XENGINES),$2-,)$1.md
+  ../README.$(LANGPART).md: $(MOD_NAME).$(LANGPART).md
 	cp $$< $$@
 endef
 
