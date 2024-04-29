@@ -3,8 +3,8 @@
 LANGS    := JA KO ZH
 RM_LANGS ?= $(LANGS)
 ENGINES  := deepl
-XLANGS   := JA
-XENGINES := gpt4
+XLANGS   :=
+XENGINES :=
 
 GET_README  := perl -MTOML -0777E 'say from_toml(<>)->{readme_from}'
 README_FROM := $(shell $(GET_README) ../minil.toml)
@@ -27,9 +27,9 @@ endif
 SRC_DIR  :=
 SRC      := $(POD:%=$(if $(SRC_DIR),$(SRC_DIR)/,)%)
 NAMES    := $(POD:%=$(notdir %))
-PODS     := $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(SRC:.pod=.$(engin)-$(lang).pod)))
-MDS      := $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(NAMES:.pod=.$(engin)-$(lang).md)))
-READMES  := $(foreach engin,$(ENGINES),$(RM_LANGS:%=../README.$(engin)-%.md))
+PODS     := $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(SRC:.pod=.$(if $(XENGINES),$(engin)-,)$(lang).pod)))
+MDS      := $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(NAMES:.pod=.$(if $(XENGINES),$(engin)-,)$(lang).md)))
+READMES  := $(foreach engin,$(ENGINES),$(RM_LANGS:%=../README.$(if $(XENGINES),$(engin)-)%.md))
 ###########
 # Translate only JA by gpt-4
 #----------
@@ -69,7 +69,7 @@ deepl_JA_FILTER := $(GREPLE) -Mperl -Msubst::desumasu \
 	--$(deepl_JA_FORM) 
 
 define LANG_POD
-  $(SRCPATH)%.$2-$1.pod: $(SRCPATH)%.pod Makefile
+  $(SRCPATH)%.$(if $(XENGINES),$2-)$1.pod: $(SRCPATH)%.pod Makefile
   ifdef $2_$1_FILTER
 	$$(XLATE) -e $2 -t $1 $$< | $$($2_$1_FILTER) > $$@
   else
@@ -84,7 +84,7 @@ $(foreach engin,$(ENGINES),$(foreach lang,$(LANGS),$(eval $(call LANG_POD,$(lang
 	pod2markdown $< > $@
 
 define LANG_README
-  ../README.$2-$1.md: $(MOD_NAME).$2-$1.md
+  ../README.$(if $(XENGINES),$2-,)$1.md: $(MOD_NAME).$(if $(XENGINES),$2-,)$1.md
 	cp $$< $$@
 endef
 
