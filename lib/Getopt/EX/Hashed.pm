@@ -298,6 +298,8 @@ sub _opt_dest {
     else {
 	if (ref $obj->{$name} eq 'CODE') {
 	    sub { &{$obj->{$name}} for $obj };
+	} elsif (ref $obj->{$name} eq 'SCALAR') {
+	    $obj->{$name};
 	} else {
 	    \$obj->{$name};
 	}
@@ -487,8 +489,13 @@ times and alter the member data.
 
 If a code reference is given, it is called at the time of B<new> to
 get default value.  This is effective when you want to evaluate the
-value at the time of execution, rather than declaration.  Use
-B<action> parameter to define a default action.
+value at the time of execution, rather than declaration.  If you want
+to define a default action, use the B<action> parameter.
+
+If a reference to SCALAR is given, the option value is stored in the
+data indicated by the reference, not in the hash object member.  In
+this case, the expected value cannot be obtained by accessing the hash
+member.
 
 =item [ B<action> => ] I<coderef>
 

@@ -151,8 +151,13 @@ Following parameters are available.
 
     If a code reference is given, it is called at the time of **new** to
     get default value.  This is effective when you want to evaluate the
-    value at the time of execution, rather than declaration.  Use
-    **action** parameter to define a default action.
+    value at the time of execution, rather than declaration.  If you want
+    to define a default action, use the **action** parameter.
+
+    If a reference to SCALAR is given, the option value is stored in the
+    data indicated by the reference, not in the hash object member.  In
+    this case, the expected value cannot be obtained by accessing the hash
+    member.
 
 - \[ **action** => \] _coderef_
 
