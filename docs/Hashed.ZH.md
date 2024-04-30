@@ -4,7 +4,7 @@ Getopt::EX::Hashed - Getopt::Long 的哈希存储对象自动化
 
 # VERSION
 
-Version 1.0503
+Version 1.0601
 
 # SYNOPSIS
 
@@ -46,7 +46,7 @@ Version 1.0503
 
 ## **has**
 
-以下列形式声明选项参数
+以下列形式声明选项参数。括号仅为清晰起见，可以省略。
 
     has option_name => ( param => value, ... );
 
@@ -54,7 +54,7 @@ Version 1.0503
 
     has number => spec => "=i n";
 
-第一个示例中的括号仅为清晰起见，可以省略。访问器以第一个名称创建。在本例中，访问器将定义为 `$app->number`。
+访问器以第一个名称创建。在本例中，访问器将定义为 `$app->number`。
 
 如果给出数组引用，则可以同时声明多个名称。
 
@@ -299,10 +299,6 @@ it under the same terms as Perl itself.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 3:
-
-    Non-ASCII character seen before =encoding in '的哈希存储对象自动化'. Assuming UTF-8
-
-- Around line 151:
+- Around line 153:
 
     Unterminated C< ... > sequence

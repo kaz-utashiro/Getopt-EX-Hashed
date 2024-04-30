@@ -1,10 +1,12 @@
+=encoding utf-8
+
 =head1 NAME
 
 Getopt::EX::Hashed - Getopt::Long 的哈希存储对象自动化
 
 =head1 VERSION
 
-Version 1.0503
+Version 1.0601
 
 =head1 SYNOPSIS
 
@@ -47,7 +49,7 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
 
 =head2 B<has>
 
-以下列形式声明选项参数
+以下列形式声明选项参数。括号仅为清晰起见，可以省略。
 
     has option_name => ( param => value, ... );
 
@@ -55,7 +57,7 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
 
     has number => spec => "=i n";
 
-第一个示例中的括号仅为清晰起见，可以省略。访问器以第一个名称创建。在本例中，访问器将定义为 C<< $app->number >>。
+访问器以第一个名称创建。在本例中，访问器将定义为 C<< $app->number >>。
 
 如果给出数组引用，则可以同时声明多个名称。
 

@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '1.06';
+our $VERSION = '1.0601';
 
 =encoding utf-8
 
@@ -10,7 +10,7 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 1.06
+Version 1.0601
 
 =head1 SYNOPSIS
 

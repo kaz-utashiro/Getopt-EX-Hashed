@@ -4,7 +4,7 @@ Getopt::EX::Hashed - Getopt::Long용 해시 저장소 객체 자동화
 
 # VERSION
 
-Version 1.0503
+Version 1.0601
 
 # SYNOPSIS
 
@@ -46,7 +46,7 @@ Version 1.0503
 
 ## **has**
 
-옵션 매개변수는 다음 형식으로 선언합니다.
+옵션 매개변수는 다음 형식으로 선언합니다. 괄호는 명확성을 위한 것으로 생략할 수 있습니다.
 
     has option_name => ( param => value, ... );
 
@@ -54,7 +54,7 @@ Version 1.0503
 
     has number => spec => "=i n";
 
-첫 번째 예의 괄호는 명확성을 위한 것으로 생략할 수 있습니다. 접근자는 첫 번째 이름으로 생성됩니다. 이 예제에서 접근자는 `$app->number`로 정의됩니다.
+접근자는 첫 번째 이름으로 생성됩니다. 이 예제에서는 접근자가 `$app->number`로 정의됩니다.
 
 배열 참조가 주어지면 한 번에 여러 이름을 선언할 수 있습니다.
 
@@ -294,11 +294,3 @@ Copyright 2021-2024 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 3:
-
-    Non-ASCII character seen before =encoding in 'Getopt::Long용'. Assuming UTF-8
