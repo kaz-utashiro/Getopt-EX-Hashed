@@ -2,6 +2,8 @@ package Getopt::EX::Hashed;
 
 our $VERSION = '1.06';
 
+=encoding utf-8
+
 =head1 NAME
 
 Getopt::EX::Hashed - Hash store object automation for Getopt::Long
@@ -392,7 +394,8 @@ Problems may occur when multiple objects are present at the same time.
 
 =head2 B<has>
 
-Declare option parameters in a following form.
+Declare option parameters in a following form.  The parentheses are
+for clarity only and may be omitted.
 
     has option_name => ( param => value, ... );
 
@@ -401,8 +404,7 @@ value as a parameter, and also can be used as C<-n>, do the following
 
     has number => spec => "=i n";
 
-The parentheses in the first example are for clarity only and may be
-omitted.  The accessor is created with the first name. In this
+The accessor is created with the first name. In this
 example, the accessor will be defined as C<< $app->number >>.
 
 If array reference is given, multiple names can be declared at once.
