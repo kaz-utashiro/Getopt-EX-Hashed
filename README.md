@@ -69,7 +69,7 @@ value as a parameter, and also can be used as `-n`, do the following
 The accessor is created with the first name. In this
 example, the accessor will be defined as `$app->number`.
 
-If array reference is given, multiple names can be declared at once.
+If an array reference is given, multiple names can be declared at once.
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
@@ -221,12 +221,13 @@ for common rules.
 
     Set the minimum and maximum limit for the argument.
 
-- **any** => _arrayref_ | qr/_regex_/
+- **any** => _arrayref_ | qr/_regex_/ | _coderef_
 
-    Set the valid string parameter list.  Each item is a string or a regex
-    reference.  The argument is valid when it is the same as, or matches
-    any item of the given list.  If the value is not an arrayref, it is
-    taken as a single item list (regexpref usually).
+    Set the valid string parameter list.  Each item can be a string, a
+    regex reference, or a code reference.  The argument is valid when it
+    is the same as, or matches any item of the given list.  If the value
+    is not an arrayref, it is taken as a single item list (regexpref or
+    coderef usually).
 
     Following declarations are almost equivalent, except second one is
     case insensitive.
@@ -247,7 +248,10 @@ for common rules.
 
 ## **new**
 
-Class method to get initialized hash object.
+Class method to create a new hash object.  Initializes all members
+with their default values and creates accessor methods as configured.
+Returns a blessed hash reference with locked keys (if LOCK\_KEYS is
+enabled).
 
 ## **optspec**
 

@@ -408,7 +408,7 @@ value as a parameter, and also can be used as C<-n>, do the following
 The accessor is created with the first name. In this
 example, the accessor will be defined as C<< $app->number >>.
 
-If array reference is given, multiple names can be declared at once.
+If an array reference is given, multiple names can be declared at once.
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
@@ -567,12 +567,13 @@ If multiple code references are given, all code must return true.
 
 Set the minimum and maximum limit for the argument.
 
-=item B<any> => I<arrayref> | qr/I<regex>/
+=item B<any> => I<arrayref> | qr/I<regex>/ | I<coderef>
 
-Set the valid string parameter list.  Each item is a string or a regex
-reference.  The argument is valid when it is the same as, or matches
-any item of the given list.  If the value is not an arrayref, it is
-taken as a single item list (regexpref usually).
+Set the valid string parameter list.  Each item can be a string, a
+regex reference, or a code reference.  The argument is valid when it
+is the same as, or matches any item of the given list.  If the value
+is not an arrayref, it is taken as a single item list (regexpref or
+coderef usually).
 
 Following declarations are almost equivalent, except second one is
 case insensitive.
@@ -595,7 +596,10 @@ value in the list.  Otherwise it causes validation error.
 
 =head2 B<new>
 
-Class method to get initialized hash object.
+Class method to create a new hash object.  Initializes all members
+with their default values and creates accessor methods as configured.
+Returns a blessed hash reference with locked keys (if LOCK_KEYS is
+enabled).
 
 =head2 B<optspec>
 
@@ -692,6 +696,25 @@ A typical use of DEFAULT is C<is> to prepare accessor methods for all
 following hash entries.  Declare C<< DEFAULT => [] >> to reset.
 
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
+
+=begin comment
+
+=item B<INVALID_MSG> (default: built-in error message generator)
+
+Set a code reference to generate error messages for validation
+failures.  The code reference receives the same arguments as the option
+handler ($_[0] is option name, $_[1] is the value for simple options,
+or $_[1] and $_[2] for hash options).  The default function generates
+messages like "--option=value: option validation error".
+
+    Getopt::EX::Hashed->configure(
+        INVALID_MSG => sub {
+            my $opt = shift;
+            "Invalid value for --$opt: @_\n";
+        }
+    );
+
+=end comment
 
 =back
 
