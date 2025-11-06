@@ -6,7 +6,7 @@ our $VERSION = '1.0601';
 
 =head1 NAME
 
-Getopt::EX::Hashed - Hash store object automation for Getopt::Long
+Getopt::EX::Hashed - Hash object automation for Getopt::Long
 
 =head1 VERSION
 
@@ -422,9 +422,9 @@ first parameter.
 
     has left => "=i", default => 1;
 
-If the number of parameters is not even, a default label is assumed to
-exist at the head: C<action> if the first parameter is a code
-reference, C<spec> otherwise.
+If the number of parameters is odd, the first parameter is treated as
+having an implicit label: C<action> if it is a code reference,
+C<spec> otherwise.
 
 Following parameters are available.
 
@@ -462,8 +462,9 @@ The above declaration will be compiled into the following string.
 
     a_to_z|a-to-z=s
 
-If nothing special is necessary, give empty (or white space only)
-string as a value.  Otherwise, it is not considered as an option.
+If no option spec is needed, give an empty (or white space only)
+string as a value.  Without a spec string, the member will not be
+treated as an option.
 
 =item B<alias> => I<string>
 
@@ -500,10 +501,10 @@ this value is effective for all members.
 Set default value.  If no default is given, the member is initialized
 as C<undef>.
 
-If the value is a reference to an ARRAY or HASH, a new reference with
-the same members is assigned.  This means that member data is shared
-across multiple C<new> calls.  Please be careful if you call C<new>
-multiple times and alter the member data.
+If the value is a reference to an ARRAY or HASH, a shallow copy is
+created for each C<new> call.  However, the contents are shared, so
+modifying the array or hash contents will affect all instances.
+Please be careful when calling C<new> multiple times.
 
 If a code reference is given, it is called at the time of B<new> to
 get default value.  This is effective when you want to evaluate the
@@ -530,8 +531,8 @@ When called, hash object is passed as C<$_>.
         $_->{left} = $_->{right} = $_[1];
     };
 
-You can use this for C<< "<>" >> to catch everything.  In that case,
-the spec parameter does not matter and is not required.
+You can use this for C<< "<>" >> to handle non-option arguments.  In
+that case, the spec parameter does not matter and is not required.
 
     has ARGV => default => [];
     has "<>" => sub {
@@ -598,8 +599,8 @@ value in the list.  Otherwise it causes validation error.
 
 Class method to create a new hash object.  Initializes all members
 with their default values and creates accessor methods as configured.
-Returns a blessed hash reference with locked keys (if LOCK_KEYS is
-enabled).
+Returns a blessed hash reference.  The hash keys are locked if
+LOCK_KEYS is enabled.
 
 =head2 B<optspec>
 
@@ -629,9 +630,9 @@ The above examples are shortcuts for the following code.
 
 =head2 B<use_keys> I<keys>
 
-Because hash keys are protected by C<Hash::Util::lock_keys>, accessing
-a non-existent member causes an error.  Use this function to declare a
-new member key before use.
+When LOCK_KEYS is enabled, accessing a non-existent member causes an
+error.  Use this method to declare new member keys before accessing
+them.
 
     $obj->use_keys( qw(foo bar) );
 
@@ -646,10 +647,10 @@ parameter.
 =head2 B<configure> B<label> => I<value>, ...
 
 Use class method C<< Getopt::EX::Hashed->configure() >> before
-creating an object; this information is stored in the area unique for
-calling package.  After calling C<new()>, package unique configuration
-is copied in the object, and it is used for further operation.  Use
-C<< $obj->configure() >> to update object unique configuration.
+creating an object; this information is stored separately for each
+calling package.  After calling C<new()>, the package-level
+configuration is copied into the object for its use.  Use
+C<< $obj->configure() >> to update object-level configuration.
 
 The following configuration parameters are available.
 
@@ -657,16 +658,17 @@ The following configuration parameters are available.
 
 =item B<LOCK_KEYS> (default: 1)
 
-Lock hash keys.  This avoids accidental access to a non-existent hash
-entry.
+Lock hash keys.  This prevents typos or other mistakes from creating
+unintended hash entries.
 
 =item B<REPLACE_UNDERSCORE> (default: 1)
 
-Produces aliases with underscores replaced by dashes.
+Automatically create option aliases with underscores replaced by
+dashes.
 
 =item B<REMOVE_UNDERSCORE> (default: 0)
 
-Produces aliases with underscores removed.
+Automatically create option aliases with underscores removed.
 
 =item B<GETOPT> (default: 'GetOptions')
 
@@ -688,9 +690,9 @@ if you don't like that behavior.
 =item B<DEFAULT>
 
 Set default parameters.  When C<has> is called, DEFAULT parameters are
-inserted before argument parameters.  So if both include the same
-parameter, the later one in the argument list has precedence.
-Incremental calls with C<+> are not affected.
+inserted before the explicit parameters.  If a parameter appears in
+both, the explicit one takes precedence.  Incremental calls with C<+>
+are not affected.
 
 A typical use of DEFAULT is C<is> to prepare accessor methods for all
 following hash entries.  Declare C<< DEFAULT => [] >> to reset.
