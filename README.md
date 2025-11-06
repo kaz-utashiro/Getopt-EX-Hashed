@@ -161,9 +161,9 @@ Following parameters are available.
     as `undef`.
 
     If the value is a reference to an ARRAY or HASH, a shallow copy is
-    created for each `new` call.  However, the contents are shared, so
-    modifying the array or hash contents will affect all instances.
-    Please be careful when calling `new` multiple times.
+    created for each `new` call.  This means the reference itself is
+    copied, but the contents are shared.  Modifying the array or hash
+    contents will affect all instances.
 
     If a code reference is given, it is called at the time of **new** to
     get default value.  This is effective when you want to evaluate the
@@ -249,10 +249,10 @@ for common rules.
 
 ## **new**
 
-Class method to create a new hash object.  Initializes all members
-with their default values and creates accessor methods as configured.
-Returns a blessed hash reference.  The hash keys are locked if
-LOCK\_KEYS is enabled.
+A class method that creates a new hash object.  Initializes all
+members with their default values and creates accessor methods as
+configured.  Returns a blessed hash reference.  The hash keys are
+locked if LOCK\_KEYS is enabled.
 
 ## **optspec**
 
@@ -368,7 +368,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021-2024 Kazumasa Utashiro
+Copyright 2021-2025 Kazumasa Utashiro
 
 # LICENSE
 

@@ -502,9 +502,9 @@ Set default value.  If no default is given, the member is initialized
 as C<undef>.
 
 If the value is a reference to an ARRAY or HASH, a shallow copy is
-created for each C<new> call.  However, the contents are shared, so
-modifying the array or hash contents will affect all instances.
-Please be careful when calling C<new> multiple times.
+created for each C<new> call.  This means the reference itself is
+copied, but the contents are shared.  Modifying the array or hash
+contents will affect all instances.
 
 If a code reference is given, it is called at the time of B<new> to
 get default value.  This is effective when you want to evaluate the
@@ -597,10 +597,10 @@ value in the list.  Otherwise it causes validation error.
 
 =head2 B<new>
 
-Class method to create a new hash object.  Initializes all members
-with their default values and creates accessor methods as configured.
-Returns a blessed hash reference.  The hash keys are locked if
-LOCK_KEYS is enabled.
+A class method that creates a new hash object.  Initializes all
+members with their default values and creates accessor methods as
+configured.  Returns a blessed hash reference.  The hash keys are
+locked if LOCK_KEYS is enabled.
 
 =head2 B<optspec>
 
@@ -740,7 +740,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021-2024 Kazumasa Utashiro
+Copyright 2021-2025 Kazumasa Utashiro
 
 =head1 LICENSE
 
