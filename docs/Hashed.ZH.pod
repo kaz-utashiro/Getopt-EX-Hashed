@@ -39,9 +39,9 @@ Version 1.0601
 =cut
 =head1 DESCRIPTION
 
-B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模块（包括 B<Getopt::EX::Long>）自动创建一个哈希对象，以存储命令行选项值。模块名称共享 B<Getopt::EX> 前缀，但到目前为止，它独立于 B<Getopt::EX> 中的其他模块运行。
+B<Getopt::EX::Hashed> 是一个自动创建哈希对象的模块，用于存储 B<Getopt::Long> 和兼容模块（包括 B<Getopt::EX::Long>）的命令行选项值。模块名称共享 B<Getopt::EX> 前缀，但到目前为止，它独立于 B<Getopt::EX> 中的其他模块运行。
 
-该模块的主要目标是将初始化和规范整合到一处。它还提供了简单的验证接口。
+该模块的主要目标是将初始化和规范整合到一个地方。它还提供了一个简单的验证接口。
 
 当给出 C<is> 参数时，将自动生成访问方法。如果已经定义了相同的函数，程序将导致致命错误。对象销毁时，访问器将被移除。当多个对象同时存在时，可能会出现问题。
 
@@ -59,19 +59,19 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
 
 访问器以第一个名称创建。在本例中，访问器将定义为 C<< $app->number >>。
 
-如果给出数组引用，则可以同时声明多个名称。
+如果给出的是数组引用，可以同时声明多个名称。
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
-如果名称以加号（C<+>）开头，给定参数将更新现有设置。
+如果名称以加号（C<+>）开头，则所给参数将更新现有设置。
 
     has '+left' => ( default => 1 );
 
-至于 C<spec> 参数，如果是第一个参数，则可以省略标签。
+至于 C<spec> 参数，如果它是第一个参数，则可以省略标签。
 
     has left => "=i", default => 1;
 
-如果参数个数不是偶数，则假定默认标签存在于头部：如果第一个参数是代码引用，则使用 C<action>，否则使用 C<spec>。
+如果参数个数不是偶数，则假定头部存在默认标签：如果第一个参数是代码引用，则使用 C<action>，否则使用 C<spec>。
 
 可使用以下参数
 
@@ -87,11 +87,11 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
 
     has start => "=i s begin";
 
-上述声明将被编译为下一个字符串。
+上述声明将被编译成以下字符串。
 
     start|s|begin=i
 
-符合 C<Getopt::Long> 的定义。当然，也可以这样写：
+符合 C<Getopt::Long> 的定义。当然，也可以写成
 
     has start => "s|begin=i";
 
@@ -99,7 +99,7 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
 
     has a_to_z => "=s";
 
-上述声明将被编译为下一个字符串。
+上述声明将被编译成以下字符串。
 
     a_to_z|a-to-z=s
 
@@ -123,19 +123,19 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
 
     $app->foo(1) unless defined $app->foo;
 
-如果要为以下所有成员设置访问器，请使用 C<configure> 设置 C<DEFAULT> 参数。
+如果要为以下所有成员创建访问器，请使用 C<configure> 设置 C<DEFAULT> 参数。
 
     Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
-如果不喜欢可分配的访问器，可将 C<ACCESSOR_LVALUE> 参数设置为 0。 因为访问器是在 C<new> 时生成的，所以该值对所有成员都有效。
+如果不喜欢可分配访问器，可将 C<ACCESSOR_LVALUE> 参数设置为 0。 因为访问器是在 C<new> 时生成的，所以该值对所有成员都有效。
 
 =item B<default> => I<value> | I<coderef>
 
 设置默认值。如果没有给出缺省值，则成员初始化为 C<undef>。
 
-如果值是 ARRAY 或 HASH 的引用，则会分配具有相同成员的新引用。这意味着成员数据将在多次调用 C<new> 时共享。如果多次调用 C<new> 并更改成员数据，请务必小心。
+如果该值是对 ARRAY 或 HASH 的引用，则会分配一个具有相同成员的新引用。这意味着成员数据将在多次调用 C<new> 时共享。如果多次调用 C<new> 并更改成员数据，请务必小心。
 
-如果给出代码引用，则在 B<new> 时调用该代码引用以获取默认值。当您想在执行时而不是在声明时评估值时，这种方法非常有效。如果要定义默认操作，请使用 B<action> 参数。
+如果给定了代码引用，则会在调用 B<new> 时调用它以获取默认值。当您想在执行时而不是在声明时评估值时，这种方法非常有效。如果要定义默认操作，请使用 B<action> 参数。如果要将代码引用设置为初始值，则必须指定一个返回代码引用的代码引用。
 
 如果给出 SCALAR 的引用，则选项值将存储在引用所指示的数据中，而不是哈希对象成员中。在这种情况下，无法通过访问哈希对象成员获得预期值。
 
@@ -150,7 +150,7 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
         $_->{left} = $_->{right} = $_[1];
     };
 
-您可以将其用于 C<< "<>">> 来捕获所有内容。在这种情况下，规格参数并不重要，也不是必需的。
+您可以将此用于 C<< "<>">> 来捕获所有内容。在这种情况下，spec 参数并不重要，也不是必需的。
 
     has ARGV => default => [];
     has "<>" => sub {
@@ -159,13 +159,13 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
 
 =back
 
-以下参数均用于数据验证。首先，C<must> 是一个通用验证器，可以实现任何功能。其他参数是通用规则的快捷方式。
+以下参数均用于数据验证。首先，C<must> 是一个通用验证器，可以实现任何功能。其他参数是常用规则的快捷方式。
 
 =over 7
 
 =item B<must> => I<coderef> | [ I<coderef> ... ]
 
-参数 C<must> 需要一个代码引用来验证选项值。它接收与 C<action> 相同的参数，并返回布尔值。在下一个例子中，选项 B<--answer> 只接受 42 作为有效值。
+参数 C<must> 需要一个代码引用来验证选项值。它接收与 C<action> 相同的参数，并返回一个布尔值。在下面的示例中，选项 B<--answer> 只接受 42 作为有效值。
 
     has answer => '=i',
         must => sub { $_[1] == 42 };
@@ -181,9 +181,9 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
 
 设置参数的最小和最大限制。
 
-=item B<any> => I<arrayref> | qr/I<regex>/
+=item B<any> => I<arrayref> | qr/I<regex>/ | I<coderef>
 
-设置有效的字符串参数列表。每项都是字符串或 regex 引用。当参数与给定列表中的任何一项相同或匹配时，参数有效。如果参数值不是数组反射，则将其视为单项列表（通常是 regexpref）。
+设置有效字符串参数列表。每个项目可以是字符串、regex 引用或代码引用。当参数与给定列表中的任何一项相同或匹配时，该参数即为有效参数。如果参数值不是数组反射，则会被视为单项列表（通常是 regexpref 或 coderef）。
 
 以下声明几乎等同，只是第二个声明不区分大小写。
 
@@ -204,15 +204,15 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 和兼容模�
 
 =head2 B<new>
 
-获取初始化哈希对象的类方法。
+创建新散列对象的类方法。使用默认值初始化所有成员，并根据配置创建访问方法。如果启用了 LOCK_KEYS，则返回带锁定键的哈希引用。
 
 =head2 B<optspec>
 
-返回可提供给 C<GetOptions> 函数的选项说明列表。
+返回可传递给 C<GetOptions> 函数的选项规范列表。
 
     GetOptions($obj->optspec)
 
-C<GetOptions> 可以通过将哈希引用作为第一个参数，将值存储在哈希对象中，但这并不是必须的。
+C<GetOptions> 可以通过将哈希引用作为第一个参数在哈希中存储值，但这并非必要。
 
 =head2 B<getopt> [ I<arrayref> ]
 
@@ -230,7 +230,7 @@ C<GetOptions> 可以通过将哈希引用作为第一个参数，将值存储在
 
 =head2 B<use_keys> I<keys>
 
-由于哈希键受 C<Hash::Util::lock_keys> 保护，访问不存在的成员会导致错误。在使用前，请使用此函数声明新的成员键。
+由于哈希键受 C<Hash::Util::lock_keys> 保护，访问不存在的成员会导致错误。在使用前，请使用此函数声明一个新的成员键。
 
     $obj->use_keys( qw(foo bar) );
 
@@ -245,17 +245,17 @@ C<GetOptions> 可以通过将哈希引用作为第一个参数，将值存储在
 
 在创建对象之前，请使用类方法 C<< Getopt::EX::Hashed->configure() >>；此信息存储在调用包的唯一区域。调用 C<new()> 后，包的唯一配置将复制到对象中，并用于进一步操作。使用 C<< $obj->configure() >> 更新对象的唯一配置。
 
-配置参数如下。
+可使用以下配置参数。
 
 =over 7
 
 =item B<LOCK_KEYS> (default: 1)
 
-锁定哈希键。这样可以避免意外访问不存在的哈希条目。
+锁定散列键。这样可以避免意外访问不存在的哈希条目。
 
 =item B<REPLACE_UNDERSCORE> (default: 1)
 
-生成用破折号替换下划线的别名。
+生成下划线被破折号替换的别名。
 
 =item B<REMOVE_UNDERSCORE> (default: 0)
 
@@ -269,19 +269,34 @@ C<GetOptions> 可以通过将哈希引用作为第一个参数，将值存储在
 
 =item B<ACCESSOR_PREFIX> (default: '')
 
-指定后，它将作为成员名的前缀，用于生成访问方法。如果 C<ACCESSOR_PREFIX> 被定义为 C<opt_>，则成员 C<file> 的访问器将是 C<opt_file>。
+指定后，它将作为成员名的前缀，使其成为访问方法。如果 C<ACCESSOR_PREFIX> 被定义为 C<opt_>，成员 C<file> 的访问器将是 C<opt_file>。
 
 =item B<ACCESSOR_LVALUE> (default: 1)
 
-如果设置为 true，读写访问器将具有 lvalue 属性。如果不喜欢这种行为，请设置为 0。
+如果为 true，读写访问器将具有 lvalue 属性。如果不喜欢这种行为，请设置为零。
 
 =item B<DEFAULT>
 
-设置默认参数。在调用 C<has> 时，DEFAULT 参数会插入到参数之前。因此，如果两个参数都包含相同的参数，参数列表中排在后面的参数优先。使用 C<+> 的递增调用不受影响。
+设置默认参数。调用 C<has> 时，DEFAULT 参数会插入到参数之前。因此，如果两个参数都包含相同的参数，在参数列表中排在后面的参数优先。使用 C<+> 的递增调用不受影响。
 
-DEFAULT 的典型用法是 C<is> 为下面所有哈希条目准备访问方法。声明 C<< DEFAULT => [] >> 以重置。
+DEFAULT 的一个典型用法是 C<is> 为下面所有哈希条目准备访问方法。声明 C<< DEFAULT => [] >> 以重置。
 
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
+
+=begin comment
+
+=item B<INVALID_MSG> (default: built-in error message generator)
+
+设置代码引用，以便在验证失败时生成错误信息。代码引用接收与选项处理程序相同的参数（$_[0] 是选项名称，$_[1] 是简单选项的值，或 $_[1] 和 $_[2] 是哈希选项的值）。默认函数会生成类似"--option=value：选项验证错误 "的信息。
+
+    Getopt::EX::Hashed->configure(
+        INVALID_MSG => sub {
+            my $opt = shift;
+            "Invalid value for --$opt: @_\n";
+        }
+    );
+
+=end comment
 
 =back
 
