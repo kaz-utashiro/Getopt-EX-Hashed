@@ -4,7 +4,7 @@ Getopt::EX::Hashed - Getopt::Long のためのハッシュオブジェクト自�
 
 # VERSION
 
-Version 1.0601
+Version 1.0602
 
 # SYNOPSIS
 

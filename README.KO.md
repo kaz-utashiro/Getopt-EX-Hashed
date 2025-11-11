@@ -4,7 +4,7 @@ Getopt::EX::Hashed - Getopt::Long을 위한 해시 객체 자동화
 
 # VERSION
 
-Version 1.0601
+Version 1.0602
 
 # SYNOPSIS
 

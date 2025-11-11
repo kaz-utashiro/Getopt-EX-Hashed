@@ -4,7 +4,7 @@ Getopt::EX::Hashed - 为 Getopt::Long 提供哈希对象自动化
 
 # VERSION
 
-Version 1.0601
+Version 1.0602
 
 # SYNOPSIS
 
