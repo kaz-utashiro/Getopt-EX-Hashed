@@ -1,7 +1,7 @@
 [
    [
-      "Getopt::EX::Hashed - Hash store object automation for Getopt::Long\n",
-      "Getopt::EX::Hashed - Getopt::Long 用ハッシュ格納オブジェクトの自動化\n"
+      "Getopt::EX::Hashed - Hash object automation for Getopt::Long\n",
+      "Getopt::EX::Hashed - Getopt::Long のハッシュオブジェクト自動化\n"
    ],
    [
       "B<Getopt::EX::Hashed> is a module to automate the creation of a hash object to store command line option values for B<Getopt::Long> and compatible modules including B<Getopt::EX::Long>. The module name shares the B<Getopt::EX> prefix, but it works independently from other modules in B<Getopt::EX>, so far.\n",
@@ -40,8 +40,8 @@
       "C<spec>パラメータについては、最初のパラメータであればラベルを省略することができる。\n"
    ],
    [
-      "If the number of parameters is not even, a default label is assumed to exist at the head: C<action> if the first parameter is a code reference, C<spec> otherwise.\n",
-      "パラメータの数が偶数でない場合、デフォルトのラベルが先頭に存在するものとみなされます：最初のパラメータがコード参照であればC<action>、そうでなければC<spec>となる。\n"
+      "If the number of parameters is odd, the first parameter is treated as having an implicit label: C<action> if it is a code reference, C<spec> otherwise.\n",
+      "パラメータの数が奇数の場合、最初のパラメータは暗黙のラベルを持つものとして扱われます：コード参照であれば C<アクション>、そうでなければ C<spec> です。\n"
    ],
    [
       "Following parameters are available.\n",
@@ -72,8 +72,8 @@
       "名前とエイリアスにアンダースコア(C<_>)が含まれている場合、アンダースコアの代わりにダッシュ(C<->)を使った別のエイリアスが定義されます。\n"
    ],
    [
-      "If nothing special is necessary, give empty (or white space only) string as a value. Otherwise, it is not considered as an option.\n",
-      "特に何もする必要がない場合は、空文字列（または空白のみ）を値として与えます。そうでない場合は、オプションとはみなされません。\n"
+      "If no option spec is needed, give an empty (or white space only) string as a value. Without a spec string, the member will not be treated as an option.\n",
+      "オプション仕様が必要ない場合は、値として空の（または空白のみの）文字列を指定します。spec 文字列がない場合、メンバはオプションとして扱われません。\n"
    ],
    [
       "Additional alias names can be specified by the B<alias> parameter too. There is no difference from the ones in the C<spec> parameter.\n",
@@ -104,8 +104,8 @@
       "デフォルト値を設定します。デフォルト値が指定されない場合、メンバはC<undef>として初期化されます。\n"
    ],
    [
-      "If the value is a reference to an ARRAY or HASH, a new reference with the same members is assigned. This means that member data is shared across multiple C<new> calls. Please be careful if you call C<new> multiple times and alter the member data.\n",
-      "値がARRAYまたはHASHへの参照である場合、同じメンバを持つ新しい参照が割り当てられます。つまり、メンバ・データは複数のC<new>呼び出しにまたがって共有されます。C<new>を複数回呼び出してメンバ・データを変更する場合は注意してください。\n"
+      "If the value is a reference to an ARRAY or HASH, a shallow copy is created for each C<new> call. This means the reference itself is copied, but the contents are shared. Modifying the array or hash contents will affect all instances.\n",
+      "値がARRAYまたはHASHへの参照である場合、C<new>の呼び出しごとに浅いコピーが作成される。これは、参照自体はコピーされるが、内容は共有されることを意味する。配列やハッシュの内容を変更すると、すべてのインスタンスに影響します。\n"
    ],
    [
       "If a code reference is given, it is called at the time of B<new> to get default value. This is effective when you want to evaluate the value at the time of execution, rather than declaration. If you want to define a default action, use the B<action> parameter. If you want to set code reference as the initial value, you must specify a code reference that returns a code reference.\n",
@@ -124,8 +124,8 @@
       "呼び出されたとき、ハッシュオブジェクトは C<$_> として渡されます。\n"
    ],
    [
-      "You can use this for C<< \"<>\" >> to catch everything. In that case, the spec parameter does not matter and is not required.\n",
-      "これをC<<\"<>\">> ですべてをキャッチすることができる。その場合、specパラメータは重要ではなく、必須ではない。\n"
+      "You can use this for C<< \"<>\" >> to handle non-option arguments. In that case, the spec parameter does not matter and is not required.\n",
+      "これを C<< \"<>\" に使うことができる。>> でオプション以外の引数を扱うことができます。その場合、specパラメータは重要ではなく、必須ではありません。\n"
    ],
    [
       "Following parameters are all for data validation. First, C<must> is a generic validator and can implement anything. Others are shortcuts for common rules.\n",
@@ -156,8 +156,8 @@
       "オプションの引数を使用する場合は、リストにデフォルト値を含めることを忘れないでください。そうしないとバリデーション・エラーになります。\n"
    ],
    [
-      "Class method to create a new hash object. Initializes all members with their default values and creates accessor methods as configured. Returns a blessed hash reference with locked keys (if LOCK_KEYS is enabled).\n",
-      "新しいハッシュオブジェクトを作成するクラスメソッド。すべてのメンバをデフォルト値で初期化し、設定に従ってアクセサメソッドを作成します。ロックされたキーを持つ祝福されたハッシュ参照を返します (LOCK_KEYS が有効な場合)。\n"
+      "A class method that creates a new hash object. Initializes all members with their default values and creates accessor methods as configured. Returns a blessed hash reference. The hash keys are locked if LOCK_KEYS is enabled.\n",
+      "新しいハッシュオブジェクトを作成するクラスメソッド。すべてのメンバをデフォルト値で初期化し、設定に従ってアクセサ・メソッドを作成します。祝福されたハッシュ参照を返します。LOCK_KEYS が有効な場合、ハッシュ・キーはロックされます。\n"
    ],
    [
       "Returns the option specification list which can be passed to the C<GetOptions> function.\n",
@@ -176,8 +176,8 @@
       "上記の例は、以下のコードのショートカットです。\n"
    ],
    [
-      "Because hash keys are protected by C<Hash::Util::lock_keys>, accessing a non-existent member causes an error. Use this function to declare a new member key before use.\n",
-      "ハッシュキーはC<Hash::Util::lock_keys>によって保護されているため、存在しないメンバにアクセスするとエラーになります。この関数を使用して、使用前に新しいメンバー・キーを宣言してください。\n"
+      "When LOCK_KEYS is enabled, accessing a non-existent member causes an error. Use this method to declare new member keys before accessing them.\n",
+      "LOCK_KEYS が有効な場合、存在しないメンバにアクセスするとエラーになります。このメソッドを使用して、新しいメンバ・キーを宣言してからアクセスしてください。\n"
    ],
    [
       "If you want to access arbitrary keys, unlock the object.\n",
@@ -188,24 +188,24 @@
       "この動作はC<configure>のC<LOCK_KEYS>パラメータで変更できます。\n"
    ],
    [
-      "Use class method C<< Getopt::EX::Hashed->configure() >> before creating an object; this information is stored in the area unique for calling package. After calling C<new()>, package unique configuration is copied in the object, and it is used for further operation. Use C<< $obj->configure() >> to update object unique configuration.\n",
-      "オブジェクトを作成する前に、クラスメソッドC<< Getopt::EX::Hashed->configure() >>を使用します。C<new()>を呼び出すと、パッケージ固有の設定がオブジェクトにコピーされ、以降の操作に使用されます。オブジェクト固有の設定を更新するには、C<< $obj->configure() >> を使用します。\n"
+      "Use class method C<< Getopt::EX::Hashed->configure() >> before creating an object; this information is stored separately for each calling package. After calling C<new()>, the package-level configuration is copied into the object for its use. Use C<< $obj->configure() >> to update object-level configuration.\n",
+      "オブジェクトを作成する前に、クラスメソッド C<< Getopt::EX::Hashed->configure() >> を使用します。C<new()> を呼び出すと、パッケージ・レベルの構成がオブジェクトにコピーされ、使用できるようになります。オブジェクト・レベルの設定を更新するには、C<< $obj->configure() >> を使用します。\n"
    ],
    [
       "The following configuration parameters are available.\n",
       "以下の設定パラメータが使用できます。\n"
    ],
    [
-      "Lock hash keys. This avoids accidental access to a non-existent hash entry.\n",
-      "ハッシュ・キーをロックします。これにより、存在しないハッシュ・エントリへの偶発的なアクセスを避けることができます。\n"
+      "Lock hash keys. This prevents typos or other mistakes from creating unintended hash entries.\n",
+      "ハッシュ・キーをロックします。これにより、タイプミスなどで意図しないハッシュエントリが作成されるのを防ぎます。\n"
    ],
    [
-      "Produces aliases with underscores replaced by dashes.\n",
-      "アンダースコアをダッシュに置き換えたエイリアスを生成します。\n"
+      "Automatically create option aliases with underscores replaced by dashes.\n",
+      "アンダースコアをダッシュに置き換えたオプション・エイリアスを自動的に作成します。\n"
    ],
    [
-      "Produces aliases with underscores removed.\n",
-      "アンダースコアを除去したエイリアスを生成する。\n"
+      "Automatically create option aliases with underscores removed.\n",
+      "アンダースコアを削除したオプション・エイリアスを自動的に作成する。\n"
    ],
    [
       "Set the function name called from the C<getopt> method.\n",
@@ -220,8 +220,8 @@
       "trueの場合、読み書きアクセサはlvalue属性を持つ。この動作を好まない場合はゼロに設定します。\n"
    ],
    [
-      "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before argument parameters. So if both include the same parameter, the later one in the argument list has precedence. Incremental calls with C<+> are not affected.\n",
-      "デフォルト・パラメータを設定する。C<has>が呼び出されると、DEFAULTパラメータが引数パラメータの前に挿入されます。そのため、両方に同じパラメータが含まれている場合は、引数リストで後の方が優先されます。C<+>によるインクリメンタルコールは影響を受けない。\n"
+      "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before the explicit parameters. If a parameter appears in both, the explicit one takes precedence. Incremental calls with C<+> are not affected.\n",
+      "デフォルトのパラメータを設定する。C<has> が呼び出されると、明示的なパラメータの前に DEFAULT パラメータが挿入されます。パラメータが両方にある場合は、明示的なパラメータが優先される。C<+> によるインクリメンタルコールは影響を受けない。\n"
    ],
    [
       "A typical use of DEFAULT is C<is> to prepare accessor methods for all following hash entries. Declare C<< DEFAULT => [] >> to reset.\n",

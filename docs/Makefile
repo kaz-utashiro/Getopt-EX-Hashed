@@ -2,7 +2,7 @@
 
 LANGS    := JA KO ZH
 RM_LANGS ?= $(LANGS)
-ENGINES  := deepl
+ENGINES  ?= gpt5
 XLANGS   :=
 XENGINES :=
 

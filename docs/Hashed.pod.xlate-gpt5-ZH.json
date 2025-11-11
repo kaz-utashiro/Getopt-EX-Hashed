@@ -1,7 +1,7 @@
 [
    [
-      "Getopt::EX::Hashed - Hash store object automation for Getopt::Long\n",
-      "Getopt::EX::Hashed - 面向 Getopt::Long 的哈希存储对象自动化\n"
+      "Getopt::EX::Hashed - Hash object automation for Getopt::Long\n",
+      "Getopt::EX::Hashed - 为 Getopt::Long 提供哈希对象自动化\n"
    ],
    [
       "B<Getopt::EX::Hashed> is a module to automate the creation of a hash object to store command line option values for B<Getopt::Long> and compatible modules including B<Getopt::EX::Long>. The module name shares the B<Getopt::EX> prefix, but it works independently from other modules in B<Getopt::EX>, so far.\n",
@@ -40,8 +40,8 @@
       "对于 C<spec> 参数，如果它是第一个参数，标签可以省略。\n"
    ],
    [
-      "If the number of parameters is not even, a default label is assumed to exist at the head: C<action> if the first parameter is a code reference, C<spec> otherwise.\n",
-      "如果参数个数不是偶数，则假定在开头存在一个默认标签：若第一个参数是代码引用则为 C<action>，否则为 C<spec>。\n"
+      "If the number of parameters is odd, the first parameter is treated as having an implicit label: C<action> if it is a code reference, C<spec> otherwise.\n",
+      "如果参数数量为奇数，第一个参数将被视为具有隐式标签：若为代码引用则为 C<action>，否则为 C<spec>。\n"
    ],
    [
       "Following parameters are available.\n",
@@ -72,8 +72,8 @@
       "如果名称和别名包含下划线（C<_>），则会再定义一个把下划线替换为短横线（C<->）的别名。\n"
    ],
    [
-      "If nothing special is necessary, give empty (or white space only) string as a value. Otherwise, it is not considered as an option.\n",
-      "若无需特殊设置，给出空字符串（或仅含空白的字符串）作为值。否则，它不会被视为一个选项。\n"
+      "If no option spec is needed, give an empty (or white space only) string as a value. Without a spec string, the member will not be treated as an option.\n",
+      "如果不需要选项规范（spec），请将一个空字符串（或仅包含空白）作为值。没有 spec 字符串时，该成员不会被视为选项。\n"
    ],
    [
       "Additional alias names can be specified by the B<alias> parameter too. There is no difference from the ones in the C<spec> parameter.\n",
@@ -104,8 +104,8 @@
       "设置默认值。如果未提供默认值，成员将初始化为 C<undef>。\n"
    ],
    [
-      "If the value is a reference to an ARRAY or HASH, a new reference with the same members is assigned. This means that member data is shared across multiple C<new> calls. Please be careful if you call C<new> multiple times and alter the member data.\n",
-      "如果该值是对 ARRAY 或 HASH 的引用，则会分配一个具有相同成员的新引用。这意味着成员数据会在多个 C<new> 调用之间共享。如果你多次调用 C<new> 并修改成员数据，请务必小心。\n"
+      "If the value is a reference to an ARRAY or HASH, a shallow copy is created for each C<new> call. This means the reference itself is copied, but the contents are shared. Modifying the array or hash contents will affect all instances.\n",
+      "如果该值是对 ARRAY 或 HASH 的引用，则每次调用 C<new> 都会创建一个浅拷贝。这意味着复制的是引用本身，但其内容是共享的。修改数组或哈希的内容将影响所有实例。\n"
    ],
    [
       "If a code reference is given, it is called at the time of B<new> to get default value. This is effective when you want to evaluate the value at the time of execution, rather than declaration. If you want to define a default action, use the B<action> parameter. If you want to set code reference as the initial value, you must specify a code reference that returns a code reference.\n",
@@ -124,8 +124,8 @@
       "调用时，哈希对象作为 C<$_> 传入。\n"
    ],
    [
-      "You can use this for C<< \"<>\" >> to catch everything. In that case, the spec parameter does not matter and is not required.\n",
-      "你可以将其用于 C<< \"<>\" >> 来捕获所有内容。在这种情况下，spec 参数无关紧要且不是必需的。\n"
+      "You can use this for C<< \"<>\" >> to handle non-option arguments. In that case, the spec parameter does not matter and is not required.\n",
+      "你可以将其用于 C<< \"<>\" >> 以处理非选项参数。在这种情况下，spec 参数无关紧要且不是必需的。\n"
    ],
    [
       "Following parameters are all for data validation. First, C<must> is a generic validator and can implement anything. Others are shortcuts for common rules.\n",
@@ -156,8 +156,8 @@
       "如果你使用可选参数，别忘了在列表中包含默认值。否则会导致验证错误。\n"
    ],
    [
-      "Class method to create a new hash object. Initializes all members with their default values and creates accessor methods as configured. Returns a blessed hash reference with locked keys (if LOCK_KEYS is enabled).\n",
-      "用于创建新哈希对象的类方法。使用其默认值初始化所有成员，并按配置创建存取器方法。返回带有加锁键（如果启用了 LOCK_KEYS）的受祝福哈希引用。\n"
+      "A class method that creates a new hash object. Initializes all members with their default values and creates accessor methods as configured. Returns a blessed hash reference. The hash keys are locked if LOCK_KEYS is enabled.\n",
+      "一个创建新的哈希对象的类方法。用默认值初始化所有成员，并按配置创建访问器方法。返回一个被祝福的哈希引用。如果启用了 LOCK_KEYS，则哈希键会被锁定。\n"
    ],
    [
       "Returns the option specification list which can be passed to the C<GetOptions> function.\n",
@@ -176,8 +176,8 @@
       "上面的示例是以下代码的简写。\n"
    ],
    [
-      "Because hash keys are protected by C<Hash::Util::lock_keys>, accessing a non-existent member causes an error. Use this function to declare a new member key before use.\n",
-      "由于哈希键被 C<Hash::Util::lock_keys> 保护，访问不存在的成员会导致错误。使用此函数在使用前声明一个新的成员键。\n"
+      "When LOCK_KEYS is enabled, accessing a non-existent member causes an error. Use this method to declare new member keys before accessing them.\n",
+      "当启用 LOCK_KEYS 时，访问不存在的成员会导致错误。请在访问之前使用此方法声明新的成员键。\n"
    ],
    [
       "If you want to access arbitrary keys, unlock the object.\n",
@@ -188,24 +188,24 @@
       "你可以通过带有 C<LOCK_KEYS> 参数的 C<configure> 来更改此行为。\n"
    ],
    [
-      "Use class method C<< Getopt::EX::Hashed->configure() >> before creating an object; this information is stored in the area unique for calling package. After calling C<new()>, package unique configuration is copied in the object, and it is used for further operation. Use C<< $obj->configure() >> to update object unique configuration.\n",
-      "在创建对象之前使用类方法 C<< Getopt::EX::Hashed->configure() >>；该信息会存储在调用包唯一的区域中。调用 C<new()> 之后，包唯一的配置会被拷贝到对象中，并用于后续操作。使用 C<< $obj->configure() >> 来更新对象唯一的配置。\n"
+      "Use class method C<< Getopt::EX::Hashed->configure() >> before creating an object; this information is stored separately for each calling package. After calling C<new()>, the package-level configuration is copied into the object for its use. Use C<< $obj->configure() >> to update object-level configuration.\n",
+      "在创建对象之前，使用类方法 C<< Getopt::EX::Hashed->configure() >>；该信息按调用包分别存储。调用 C<new()> 之后，包级配置会被复制到对象中供其使用。使用 C<< $obj->configure() >> 更新对象级配置。\n"
    ],
    [
       "The following configuration parameters are available.\n",
       "可用的配置参数如下。\n"
    ],
    [
-      "Lock hash keys. This avoids accidental access to a non-existent hash entry.\n",
-      "锁定哈希键。这可以避免意外访问不存在的哈希条目。\n"
+      "Lock hash keys. This prevents typos or other mistakes from creating unintended hash entries.\n",
+      "锁定哈希键。这可防止因拼写错误或其他失误而创建非预期的哈希条目。\n"
    ],
    [
-      "Produces aliases with underscores replaced by dashes.\n",
-      "生成将下划线替换为连字符的别名。\n"
+      "Automatically create option aliases with underscores replaced by dashes.\n",
+      "自动创建将下划线替换为连字符的选项别名。\n"
    ],
    [
-      "Produces aliases with underscores removed.\n",
-      "生成移除下划线的别名。\n"
+      "Automatically create option aliases with underscores removed.\n",
+      "自动创建移除下划线的选项别名。\n"
    ],
    [
       "Set the function name called from the C<getopt> method.\n",
@@ -220,8 +220,8 @@
       "如果为真，读写访问器具有 lvalue 属性。如果你不喜欢这种行为，请设为零。\n"
    ],
    [
-      "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before argument parameters. So if both include the same parameter, the later one in the argument list has precedence. Incremental calls with C<+> are not affected.\n",
-      "设置默认参数。当调用 C<has> 时，DEFAULT 参数会在参数列表之前插入。因此如果两者都包含同一参数，后出现的参数优先。带有 C<+> 的递增调用不受影响。\n"
+      "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before the explicit parameters. If a parameter appears in both, the explicit one takes precedence. Incremental calls with C<+> are not affected.\n",
+      "设置默认参数。当调用 C<has> 时，DEFAULT 参数会插入到显式参数之前。若两者都有同一参数，则以显式参数为准。带有 C<+> 的增量调用不受影响。\n"
    ],
    [
       "A typical use of DEFAULT is C<is> to prepare accessor methods for all following hash entries. Declare C<< DEFAULT => [] >> to reset.\n",

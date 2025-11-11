@@ -1,7 +1,7 @@
 [
    [
-      "Getopt::EX::Hashed - Hash store object automation for Getopt::Long\n",
-      "Getopt::EX::Hashed - Getopt::Long용 해시 저장소 객체 자동화\n"
+      "Getopt::EX::Hashed - Hash object automation for Getopt::Long\n",
+      "Getopt::EX::Hashed - Getopt::Long을 위한 해시 객체 자동화\n"
    ],
    [
       "B<Getopt::EX::Hashed> is a module to automate the creation of a hash object to store command line option values for B<Getopt::Long> and compatible modules including B<Getopt::EX::Long>. The module name shares the B<Getopt::EX> prefix, but it works independently from other modules in B<Getopt::EX>, so far.\n",
@@ -40,8 +40,8 @@
       "C<spec> 파라미터의 경우 첫 번째 파라미터인 경우 레이블을 생략할 수 있습니다.\n"
    ],
    [
-      "If the number of parameters is not even, a default label is assumed to exist at the head: C<action> if the first parameter is a code reference, C<spec> otherwise.\n",
-      "매개변수 수가 짝수가 아닌 경우 기본 레이블이 맨 앞에 있는 것으로 간주합니다: 첫 번째 매개변수가 코드 참조인 경우 C<action>, 그렇지 않은 경우 C<spec>입니다.\n"
+      "If the number of parameters is odd, the first parameter is treated as having an implicit label: C<action> if it is a code reference, C<spec> otherwise.\n",
+      "매개 변수의 수가 홀수인 경우 첫 번째 매개 변수는 암시적 레이블이 있는 것으로 처리됩니다: 코드 참조인 경우 C<action>, 그렇지 않으면 C<spec>입니다.\n"
    ],
    [
       "Following parameters are available.\n",
@@ -72,8 +72,8 @@
       "이름과 별칭에 밑줄(C<_>)이 포함된 경우 밑줄 대신 대시(C<->)를 사용하여 다른 별칭 이름을 정의합니다.\n"
    ],
    [
-      "If nothing special is necessary, give empty (or white space only) string as a value. Otherwise, it is not considered as an option.\n",
-      "특별히 필요한 것이 없으면 빈(또는 공백만 있는) 문자열을 값으로 지정합니다. 그렇지 않으면 옵션으로 간주되지 않습니다.\n"
+      "If no option spec is needed, give an empty (or white space only) string as a value. Without a spec string, the member will not be treated as an option.\n",
+      "옵션 사양이 필요하지 않은 경우 빈(또는 공백만 있는) 문자열을 값으로 지정합니다. 사양 문자열이 없으면 멤버는 옵션으로 취급되지 않습니다.\n"
    ],
    [
       "Additional alias names can be specified by the B<alias> parameter too. There is no difference from the ones in the C<spec> parameter.\n",
@@ -104,8 +104,8 @@
       "기본값을 설정합니다. 기본값을 지정하지 않으면 멤버는 C<undef>로 초기화됩니다.\n"
    ],
    [
-      "If the value is a reference to an ARRAY or HASH, a new reference with the same members is assigned. This means that member data is shared across multiple C<new> calls. Please be careful if you call C<new> multiple times and alter the member data.\n",
-      "값이 배열 또는 해시에 대한 참조인 경우 동일한 멤버를 가진 새 참조가 할당됩니다. 즉, 멤버 데이터가 여러 C<new> 호출에 걸쳐 공유됩니다. C<new>를 여러 번 호출하여 멤버 데이터를 변경하는 경우 주의하세요.\n"
+      "If the value is a reference to an ARRAY or HASH, a shallow copy is created for each C<new> call. This means the reference itself is copied, but the contents are shared. Modifying the array or hash contents will affect all instances.\n",
+      "값이 배열 또는 해시에 대한 참조인 경우, 각 C<new> 호출에 대해 얕은 복사본이 생성됩니다. 즉, 참조 자체는 복사되지만 내용은 공유됩니다. 배열 또는 해시 내용을 수정하면 모든 인스턴스에 영향을 미칩니다.\n"
    ],
    [
       "If a code reference is given, it is called at the time of B<new> to get default value. This is effective when you want to evaluate the value at the time of execution, rather than declaration. If you want to define a default action, use the B<action> parameter. If you want to set code reference as the initial value, you must specify a code reference that returns a code reference.\n",
@@ -124,8 +124,8 @@
       "호출되면 해시 객체가 C<$_>로 전달됩니다.\n"
    ],
    [
-      "You can use this for C<< \"<>\" >> to catch everything. In that case, the spec parameter does not matter and is not required.\n",
-      "C<< \"<>\" >>에 사용하여 모든 것을 잡을 수 있습니다. 이 경우 사양 매개변수는 중요하지 않으며 필요하지 않습니다.\n"
+      "You can use this for C<< \"<>\" >> to handle non-option arguments. In that case, the spec parameter does not matter and is not required.\n",
+      "C<< \"<>\" >>에 사용하여 옵션이 아닌 인수를 처리할 수 있습니다. 이 경우 사양 매개변수는 중요하지 않으며 필요하지 않습니다.\n"
    ],
    [
       "Following parameters are all for data validation. First, C<must> is a generic validator and can implement anything. Others are shortcuts for common rules.\n",
@@ -156,8 +156,8 @@
       "선택적 인수를 사용하는 경우 목록에 기본값을 포함하는 것을 잊지 마세요. 그렇지 않으면 유효성 검사 오류가 발생합니다.\n"
    ],
    [
-      "Class method to create a new hash object. Initializes all members with their default values and creates accessor methods as configured. Returns a blessed hash reference with locked keys (if LOCK_KEYS is enabled).\n",
-      "새 해시 객체를 생성하는 클래스 메서드입니다. 모든 멤버를 기본값으로 초기화하고 구성된 대로 접근자 메서드를 생성합니다. 잠긴 키가 있는 축복받은 해시 참조를 반환합니다(LOCK_KEYS가 활성화된 경우).\n"
+      "A class method that creates a new hash object. Initializes all members with their default values and creates accessor methods as configured. Returns a blessed hash reference. The hash keys are locked if LOCK_KEYS is enabled.\n",
+      "새 해시 객체를 생성하는 클래스 메서드입니다. 모든 멤버를 기본값으로 초기화하고 구성된 대로 접근자 메서드를 생성합니다. 축복받은 해시 참조를 반환합니다. LOCK_KEYS가 활성화된 경우 해시 키는 잠깁니다.\n"
    ],
    [
       "Returns the option specification list which can be passed to the C<GetOptions> function.\n",
@@ -176,8 +176,8 @@
       "위의 예는 다음 코드의 단축키입니다.\n"
    ],
    [
-      "Because hash keys are protected by C<Hash::Util::lock_keys>, accessing a non-existent member causes an error. Use this function to declare a new member key before use.\n",
-      "해시 키는 C<Hash::Util::lock_keys>에 의해 보호되므로 존재하지 않는 멤버에 액세스하면 오류가 발생합니다. 이 함수를 사용하여 사용하기 전에 새 멤버 키를 선언하세요.\n"
+      "When LOCK_KEYS is enabled, accessing a non-existent member causes an error. Use this method to declare new member keys before accessing them.\n",
+      "LOCK_KEYS가 활성화된 경우 존재하지 않는 멤버에 액세스하면 오류가 발생합니다. 새 멤버 키에 액세스하기 전에 이 메서드를 사용하여 새 멤버 키를 선언하세요.\n"
    ],
    [
       "If you want to access arbitrary keys, unlock the object.\n",
@@ -188,24 +188,24 @@
       "이 동작은 C<configure>에서 C<LOCK_KEYS> 매개변수를 사용하여 변경할 수 있습니다.\n"
    ],
    [
-      "Use class method C<< Getopt::EX::Hashed->configure() >> before creating an object; this information is stored in the area unique for calling package. After calling C<new()>, package unique configuration is copied in the object, and it is used for further operation. Use C<< $obj->configure() >> to update object unique configuration.\n",
-      "객체를 생성하기 전에 클래스 메서드 C<< Getopt::EX::Hashed->configure() >>를 사용하면 이 정보가 패키지 호출을 위한 고유 영역에 저장됩니다. C<new()>를 호출한 후 패키지 고유 구성이 객체에 복사되고 추가 작업에 사용됩니다. 객체 고유 구성을 업데이트하려면 C<< $obj->configure() >>를 사용합니다.\n"
+      "Use class method C<< Getopt::EX::Hashed->configure() >> before creating an object; this information is stored separately for each calling package. After calling C<new()>, the package-level configuration is copied into the object for its use. Use C<< $obj->configure() >> to update object-level configuration.\n",
+      "객체를 생성하기 전에 클래스 메서드 C<< Getopt::EX::Hashed->configure() >>를 사용하면 이 정보는 각 호출 패키지에 대해 별도로 저장됩니다. C<new()>를 호출하면 패키지 수준 구성이 객체에 복사되어 사용됩니다. 객체 수준 구성을 업데이트하려면 C<< $obj->configure() >>를 사용합니다.\n"
    ],
    [
       "The following configuration parameters are available.\n",
       "다음과 같은 구성 매개변수를 사용할 수 있습니다.\n"
    ],
    [
-      "Lock hash keys. This avoids accidental access to a non-existent hash entry.\n",
-      "해시 키 잠금. 존재하지 않는 해시 항목에 실수로 액세스하는 것을 방지합니다.\n"
+      "Lock hash keys. This prevents typos or other mistakes from creating unintended hash entries.\n",
+      "해시 키 잠그기. 이렇게 하면 오타나 기타 실수로 인해 의도하지 않은 해시 항목이 생성되는 것을 방지할 수 있습니다.\n"
    ],
    [
-      "Produces aliases with underscores replaced by dashes.\n",
-      "밑줄이 대시로 대체된 별칭을 생성합니다.\n"
+      "Automatically create option aliases with underscores replaced by dashes.\n",
+      "밑줄이 대시로 대체된 옵션 별칭을 자동으로 생성합니다.\n"
    ],
    [
-      "Produces aliases with underscores removed.\n",
-      "밑줄이 제거된 별칭을 생성합니다.\n"
+      "Automatically create option aliases with underscores removed.\n",
+      "밑줄이 제거된 옵션 별칭을 자동으로 생성합니다.\n"
    ],
    [
       "Set the function name called from the C<getopt> method.\n",
@@ -220,8 +220,8 @@
       "true이면 읽기-쓰기 액세스자는 lvalue 속성을 갖습니다. 이 동작이 마음에 들지 않으면 0으로 설정하세요.\n"
    ],
    [
-      "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before argument parameters. So if both include the same parameter, the later one in the argument list has precedence. Incremental calls with C<+> are not affected.\n",
-      "기본 매개변수를 설정합니다. C<has>가 호출되면 인수 매개변수 앞에 DEFAULT 매개변수가 삽입됩니다. 따라서 둘 다 동일한 매개변수를 포함하는 경우 인수 목록에서 나중에 포함된 매개변수가 우선합니다. C<+>를 사용한 증분 호출은 영향을 받지 않습니다.\n"
+      "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before the explicit parameters. If a parameter appears in both, the explicit one takes precedence. Incremental calls with C<+> are not affected.\n",
+      "기본 매개변수 설정. C<has>가 호출되면 명시적 매개변수 앞에 기본 매개변수가 삽입됩니다. 매개 변수가 둘 다에 나타나면 명시적 매개 변수가 우선합니다. C<+>를 사용한 증분 호출은 영향을 받지 않습니다.\n"
    ],
    [
       "A typical use of DEFAULT is C<is> to prepare accessor methods for all following hash entries. Declare C<< DEFAULT => [] >> to reset.\n",

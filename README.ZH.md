@@ -1,6 +1,6 @@
 # NAME
 
-Getopt::EX::Hashed - 面向 Getopt::Long 的哈希存储对象自动化
+Getopt::EX::Hashed - 为 Getopt::Long 提供哈希对象自动化
 
 # VERSION
 
@@ -68,7 +68,7 @@ Version 1.0601
 
     has left => "=i", default => 1;
 
-如果参数个数不是偶数，则假定在开头存在一个默认标签：若第一个参数是代码引用则为 `action`，否则为 `spec`。
+如果参数数量为奇数，第一个参数将被视为具有隐式标签：若为代码引用则为 `action`，否则为 `spec`。
 
 可用的参数如下。
 
@@ -98,7 +98,7 @@ Version 1.0601
 
         a_to_z|a-to-z=s
 
-    若无需特殊设置，给出空字符串（或仅含空白的字符串）作为值。否则，它不会被视为一个选项。
+    如果不需要选项规范（spec），请将一个空字符串（或仅包含空白）作为值。没有 spec 字符串时，该成员不会被视为选项。
 
 - **alias** => _string_
 
@@ -128,7 +128,7 @@ Version 1.0601
 
     设置默认值。如果未提供默认值，成员将初始化为 `undef`。
 
-    如果该值是对 ARRAY 或 HASH 的引用，则会分配一个具有相同成员的新引用。这意味着成员数据会在多个 `new` 调用之间共享。如果你多次调用 `new` 并修改成员数据，请务必小心。
+    如果该值是对 ARRAY 或 HASH 的引用，则每次调用 `new` 都会创建一个浅拷贝。这意味着复制的是引用本身，但其内容是共享的。修改数组或哈希的内容将影响所有实例。
 
     如果提供了代码引用，它会在 **new** 时被调用以获得默认值。当你希望在执行时而非声明时计算该值时，这很有效。如果你想定义默认动作，请使用 **action** 参数。如果你想将代码引用设置为初始值，你必须指定一个返回代码引用的代码引用。
 
@@ -145,7 +145,7 @@ Version 1.0601
             $_->{left} = $_->{right} = $_[1];
         };
 
-    你可以将其用于 `"<>"` 来捕获所有内容。在这种情况下，spec 参数无关紧要且不是必需的。
+    你可以将其用于 `"<>"` 以处理非选项参数。在这种情况下，spec 参数无关紧要且不是必需的。
 
         has ARGV => default => [];
         has "<>" => sub {
@@ -192,7 +192,7 @@ Version 1.0601
 
 ## **new**
 
-用于创建新哈希对象的类方法。使用其默认值初始化所有成员，并按配置创建存取器方法。返回带有加锁键（如果启用了 LOCK\_KEYS）的受祝福哈希引用。
+一个创建新的哈希对象的类方法。用默认值初始化所有成员，并按配置创建访问器方法。返回一个被祝福的哈希引用。如果启用了 LOCK\_KEYS，则哈希键会被锁定。
 
 ## **optspec**
 
@@ -218,7 +218,7 @@ Version 1.0601
 
 ## **use\_keys** _keys_
 
-由于哈希键被 `Hash::Util::lock_keys` 保护，访问不存在的成员会导致错误。使用此函数在使用前声明一个新的成员键。
+当启用 LOCK\_KEYS 时，访问不存在的成员会导致错误。请在访问之前使用此方法声明新的成员键。
 
     $obj->use_keys( qw(foo bar) );
 
@@ -231,21 +231,21 @@ Version 1.0601
 
 ## **configure** **label** => _value_, ...
 
-在创建对象之前使用类方法 `Getopt::EX::Hashed->configure()`；该信息会存储在调用包唯一的区域中。调用 `new()` 之后，包唯一的配置会被拷贝到对象中，并用于后续操作。使用 `$obj->configure()` 来更新对象唯一的配置。
+在创建对象之前，使用类方法 `Getopt::EX::Hashed->configure()`；该信息按调用包分别存储。调用 `new()` 之后，包级配置会被复制到对象中供其使用。使用 `$obj->configure()` 更新对象级配置。
 
 可用的配置参数如下。
 
 - **LOCK\_KEYS** (default: 1)
 
-    锁定哈希键。这可以避免意外访问不存在的哈希条目。
+    锁定哈希键。这可防止因拼写错误或其他失误而创建非预期的哈希条目。
 
 - **REPLACE\_UNDERSCORE** (default: 1)
 
-    生成将下划线替换为连字符的别名。
+    自动创建将下划线替换为连字符的选项别名。
 
 - **REMOVE\_UNDERSCORE** (default: 0)
 
-    生成移除下划线的别名。
+    自动创建移除下划线的选项别名。
 
 - **GETOPT** (default: 'GetOptions')
 - **GETOPT\_FROM\_ARRAY** (default: 'GetOptionsFromArray')
@@ -262,7 +262,7 @@ Version 1.0601
 
 - **DEFAULT**
 
-    设置默认参数。当调用 `has` 时，DEFAULT 参数会在参数列表之前插入。因此如果两者都包含同一参数，后出现的参数优先。带有 `+` 的递增调用不受影响。
+    设置默认参数。当调用 `has` 时，DEFAULT 参数会插入到显式参数之前。若两者都有同一参数，则以显式参数为准。带有 `+` 的增量调用不受影响。
 
     DEFAULT 的典型用法是使用 `is` 为随后的所有哈希条目准备访问器方法。声明 `DEFAULT => []` 可重置。
 
@@ -288,7 +288,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021-2024 Kazumasa Utashiro
+Copyright 2021-2025 Kazumasa Utashiro
 
 # LICENSE
 
