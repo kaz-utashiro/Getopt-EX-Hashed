@@ -85,7 +85,7 @@ sub import {
     my $config = __Config__($caller);
     unless (%$config) {
 	unlock_keys %$config;
-	%$config = %DefaultConfig or die "something wrong!";
+	%$config = %DefaultConfig or die "Failed to initialize config";
 	lock_keys %$config;
     }
 }
@@ -109,7 +109,7 @@ sub configure {
     while (my($key, $value) = splice @_, 0, 2) {
 	if ($key eq 'DEFAULT') {
 	    ref($value) eq 'ARRAY' or die "DEFAULT must be arrayref";
-	    @$value % 2 == 0       or die "DEFAULT have wrong member";
+	    @$value % 2 == 0       or die "DEFAULT has wrong members";
 	}
 	$config->{$key} = $value;
     }
@@ -271,7 +271,7 @@ sub _compile {
     my $spec = do {
 	if    (@spec == 0) { '' }
 	elsif (@spec == 1) { $spec[0] }
-	else               { die }
+	else               { die "Multiple option specs found: @spec" }
     };
     my @names = ($name, @alias);
     for ($name, @alias) {
