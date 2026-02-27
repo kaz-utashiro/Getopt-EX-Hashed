@@ -40,11 +40,11 @@ ok(App2->can('name'), "accessor persists after destroy with REMOVE_ACCESSOR=0");
     no Getopt::EX::Hashed;
 }
 
-{
-    use Clone qw(clone);
+SKIP: {
+    skip "Clone not available", 2 unless eval { require Clone; 1 };
     my $app = App3->new;
     {
-        my $copy = clone($app);
+        my $copy = Clone::clone($app);
         is($copy->name, 'Carol', "clone accessor works");
     }
     # $copy (clone) is destroyed here - accessor should still be there
