@@ -12,8 +12,12 @@
       "このモジュールの主目的は、初期化と仕様の定義を一箇所に統合することです。簡易な検証インターフェースも提供します。\n"
    ],
    [
-      "Accessor methods are automatically generated when C<is> parameter is given. If the same function is already defined, the program causes fatal error. Accessors persist after the object is destroyed. If you want to remove them on destruction, set C<REMOVE_ACCESSOR> configuration parameter to true.\n",
-      "C<is> パラメータが与えられると、アクセサメソッドが自動的に生成されます。同じ関数がすでに定義されている場合、プログラムは致命的なエラーを引き起こします。オブジェクトが破棄された後もアクセサは残ります。破棄時にそれらを削除したい場合は、C<REMOVE_ACCESSOR> 構成パラメータを true に設定してください。\n"
+      "Accessor methods are automatically generated when C<is> parameter is given. If the same function is already defined, the program causes fatal error. By default, accessors are removed from the package namespace when the object is destroyed. This allows the same class to be used more than once within a single script — for example, when a module using Hashed-based objects is called from multiple places.\n",
+      "C<is> パラメータが与えられると、アクセサメソッドは自動的に生成されます。同名の関数がすでに定義されている場合、プログラムは致命的エラーになります。デフォルトでは、オブジェクトが破棄されるとアクセサはパッケージの名前空間から削除されます。これにより、同一のクラスを1つのスクリプト内で複数回使用できます（たとえば、ハッシュベースのオブジェクトを用いるモジュールが複数箇所から呼び出される場合）。\n"
+   ],
+   [
+      "Objects created by copying (e.g. via L<Clone>) are not considered owners of the accessors. Only the object originally created by C<new> removes the accessors on destruction, so cloned objects can be safely destroyed without affecting the original object or its class. To keep accessors after destruction, set C<REMOVE_ACCESSOR> to false.\n",
+      "コピーによって作成されたオブジェクト（例：L<Clone> 経由）はアクセサの所有者とは見なされません。C<new> によって最初に作成されたオリジナルのオブジェクトのみが、破棄時にアクセサを削除します。そのため、クローンを破棄しても元のオブジェクトやそのクラスに影響を与えることはありません。破棄後もアクセサを保持したい場合は、C<REMOVE_ACCESSOR> を偽に設定してください。\n"
    ],
    [
       "Declare option parameters in the following form. The parentheses are for clarity only and may be omitted.\n",
@@ -220,8 +224,16 @@
       "真の場合、読み書きアクセサに lvalue 属性が付きます。その挙動が好みでない場合は 0 に設定してください。\n"
    ],
    [
-      "If true, accessor methods are removed from the package namespace when the object is destroyed. This is intended for cases where the module is embedded in an existing class and the generated accessors should not persist after the object is no longer needed. By default, accessors are left in place.\n",
-      "true の場合、オブジェクトが破棄されると、アクセサメソッドはパッケージの名前空間から削除されます。これは、モジュールが既存のクラスに埋め込まれており、生成されたアクセサを不要になった後に残さないようにしたい場合を想定しています。デフォルトでは、アクセサはそのまま残ります。\n"
+      "If true, accessor methods are removed from the package namespace when the object is destroyed. This allows the same class to be used multiple times within a single script without causing conflicts.\n",
+      "真の場合、オブジェクトが破棄されるとアクセサメソッドはパッケージの名前空間から削除されます。これにより、同一のクラスを1つのスクリプト内で複数回使用しても競合を引き起こしません。\n"
+   ],
+   [
+      "Only the object originally created by C<new> is considered the owner of the accessors. Objects created by copying (e.g. via L<Clone>) are not owners, so destroying a clone does not remove the accessors even when C<REMOVE_ACCESSOR> is true.\n",
+      "C<new> によって最初に作成されたオブジェクトのみがアクセサの所有者と見なされます。コピーによって作成されたオブジェクト（例：L<Clone>）は所有者ではないため、C<REMOVE_ACCESSOR> が真であっても、クローンを破棄してもアクセサは削除されません。\n"
+   ],
+   [
+      "Set to false if you want accessors to persist beyond the lifetime of the object, for example when the accessor methods are intended to be part of the class's permanent public interface.\n",
+      "オブジェクトのライフタイムを超えてアクセサを存続させたい場合、たとえばアクセサメソッドをクラスの恒久的なパブリックインターフェースの一部とする意図がある場合は、偽に設定してください。\n"
    ],
    [
       "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before the explicit parameters. If a parameter appears in both, the explicit one takes precedence. Incremental calls with C<+> are not affected.\n",
