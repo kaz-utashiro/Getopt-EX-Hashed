@@ -80,6 +80,7 @@ my %DefaultConfig = (
     GETOPT_FROM_ARRAY  => 'GetOptionsFromArray',
     ACCESSOR_PREFIX    => '',
     ACCESSOR_LVALUE    => 1,
+    REMOVE_ACCESSOR    => 0,
     DEFAULT            => [],
     INVALID_MSG        => \&_invalid_msg,
     );
@@ -220,6 +221,7 @@ sub new {
 #
 sub DESTROY {
     my $obj = shift;
+    return unless $obj->_conf->{REMOVE_ACCESSOR};
     my $pkg = ref $obj;
     my $hash = do { no strict 'refs'; \%{"$pkg\::"} };
     my $prefix = $obj->_conf->{ACCESSOR_PREFIX};
@@ -472,8 +474,9 @@ validation interface.
 
 Accessor methods are automatically generated when C<is> parameter is
 given.  If the same function is already defined, the program causes
-fatal error.  Accessors are removed when the object is destroyed.
-Problems may occur when multiple objects are present at the same time.
+fatal error.  Accessors persist after the object is destroyed.  If
+you want to remove them on destruction, set C<REMOVE_ACCESSOR>
+configuration parameter to true.
 
 =head1 FUNCTION
 
@@ -770,6 +773,14 @@ accessor for member C<file> will be C<opt_file>.
 
 If true, read-write accessors have the lvalue attribute.  Set to zero
 if you don't like that behavior.
+
+=item B<REMOVE_ACCESSOR> (default: 0)
+
+If true, accessor methods are removed from the package namespace when
+the object is destroyed.  This is intended for cases where the module
+is embedded in an existing class and the generated accessors should
+not persist after the object is no longer needed.  By default,
+accessors are left in place.
 
 =item B<DEFAULT>
 
