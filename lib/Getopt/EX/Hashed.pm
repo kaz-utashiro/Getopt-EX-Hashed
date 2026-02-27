@@ -45,6 +45,7 @@ Version 1.07
 use v5.14;
 use warnings;
 use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
+use Scalar::Util qw(refaddr);
 use Carp;
 use Data::Dumper;
 use List::Util qw(first);
@@ -53,6 +54,14 @@ use List::Util qw(first);
 # Store metadata in caller context
 #
 my  %__DB__;
+
+#
+# Track objects created by new() to distinguish from Clone copies.
+# Only "master" objects (created by new) are allowed to remove accessors
+# on destruction, preventing clone objects from destroying shared class-level
+# accessors that the original object still needs.
+#
+my %_masters;
 
 #
 # Get or create package-specific metadata storage namespace
@@ -80,7 +89,7 @@ my %DefaultConfig = (
     GETOPT_FROM_ARRAY  => 'GetOptionsFromArray',
     ACCESSOR_PREFIX    => '',
     ACCESSOR_LVALUE    => 1,
-    REMOVE_ACCESSOR    => 0,
+    REMOVE_ACCESSOR    => 1,
     DEFAULT            => [],
     INVALID_MSG        => \&_invalid_msg,
     );
@@ -213,6 +222,7 @@ sub new {
 	};
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
+    $_masters{refaddr($obj)} = 1;
     $obj;
 }
 
@@ -221,6 +231,7 @@ sub new {
 #
 sub DESTROY {
     my $obj = shift;
+    return unless delete $_masters{refaddr($obj)};
     return unless $obj->_conf->{REMOVE_ACCESSOR};
     my $pkg = ref $obj;
     my $hash = do { no strict 'refs'; \%{"$pkg\::"} };
@@ -474,9 +485,17 @@ validation interface.
 
 Accessor methods are automatically generated when C<is> parameter is
 given.  If the same function is already defined, the program causes
-fatal error.  Accessors persist after the object is destroyed.  If
-you want to remove them on destruction, set C<REMOVE_ACCESSOR>
-configuration parameter to true.
+fatal error.  By default, accessors are removed from the package
+namespace when the object is destroyed.  This allows the same class
+to be used more than once within a single script — for example, when
+a module using Hashed-based objects is called from multiple places.
+
+Objects created by copying (e.g. via L<Clone>) are not considered
+owners of the accessors.  Only the object originally created by
+C<new> removes the accessors on destruction, so cloned objects can
+be safely destroyed without affecting the original object or its
+class.  To keep accessors after destruction, set C<REMOVE_ACCESSOR>
+to false.
 
 =head1 FUNCTION
 
@@ -774,13 +793,20 @@ accessor for member C<file> will be C<opt_file>.
 If true, read-write accessors have the lvalue attribute.  Set to zero
 if you don't like that behavior.
 
-=item B<REMOVE_ACCESSOR> (default: 0)
+=item B<REMOVE_ACCESSOR> (default: 1)
 
 If true, accessor methods are removed from the package namespace when
-the object is destroyed.  This is intended for cases where the module
-is embedded in an existing class and the generated accessors should
-not persist after the object is no longer needed.  By default,
-accessors are left in place.
+the object is destroyed.  This allows the same class to be used
+multiple times within a single script without causing conflicts.
+
+Only the object originally created by C<new> is considered the owner
+of the accessors.  Objects created by copying (e.g. via L<Clone>)
+are not owners, so destroying a clone does not remove the accessors
+even when C<REMOVE_ACCESSOR> is true.
+
+Set to false if you want accessors to persist beyond the lifetime of
+the object, for example when the accessor methods are intended to be
+part of the class's permanent public interface.
 
 =item B<DEFAULT>
 

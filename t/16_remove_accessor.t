@@ -21,6 +21,7 @@ ok(!App1->can('name'), "accessor removed after destroy with REMOVE_ACCESSOR");
 {
     package App2;
     use Getopt::EX::Hashed;
+    Getopt::EX::Hashed->configure(REMOVE_ACCESSOR => 0);
     has name => ( default => 'Bob', is => 'rw' );
     no Getopt::EX::Hashed;
 }
@@ -30,6 +31,24 @@ ok(!App1->can('name'), "accessor removed after destroy with REMOVE_ACCESSOR");
     is($app->name, 'Bob', "accessor works");
 }
 # $app is destroyed here
-ok(App2->can('name'), "accessor persists after destroy without REMOVE_ACCESSOR");
+ok(App2->can('name'), "accessor persists after destroy with REMOVE_ACCESSOR=0");
+
+{
+    package App3;
+    use Getopt::EX::Hashed;
+    has name => ( default => 'Carol', is => 'rw' );
+    no Getopt::EX::Hashed;
+}
+
+{
+    use Clone qw(clone);
+    my $app = App3->new;
+    {
+        my $copy = clone($app);
+        is($copy->name, 'Carol', "clone accessor works");
+    }
+    # $copy (clone) is destroyed here - accessor should still be there
+    ok(App3->can('name'), "accessor persists after clone is destroyed");
+}
 
 done_testing;
