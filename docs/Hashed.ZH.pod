@@ -6,7 +6,7 @@ Getopt::EX::Hashed - 为 Getopt::Long 提供哈希对象自动化
 
 =head1 VERSION
 
-Version 1.0602
+Version 1.07
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ B<Getopt::EX::Hashed> 是一个模块，用于为 B<Getopt::Long> 及其兼容�
 
 本模块的主要目标是将初始化与规范定义整合在同一处。它还提供了一个简单的校验接口。
 
-当提供 C<is> 参数时，会自动生成访问器方法。如果同名函数已存在，程序将发生致命错误。对象销毁时，访问器将被移除。当同时存在多个对象时可能出现问题。
+当提供 C<is> 参数时，会自动生成访问器方法。如果同名函数已被定义，程序将导致致命错误。对象被销毁后，访问器仍会保留。若希望在销毁时移除它们，请将配置参数 C<REMOVE_ACCESSOR> 设为 true。
 
 =head1 FUNCTION
 
@@ -275,6 +275,10 @@ C<GetOptions> 具备通过将哈希引用作为第一个参数来将值存储到
 
 如果为真，读写访问器具有 lvalue 属性。如果你不喜欢这种行为，请设为零。
 
+=item B<REMOVE_ACCESSOR> (default: 0)
+
+若为 true，当对象被销毁时，将从包命名空间中移除访问器方法。此选项适用于模块嵌入到已有类且在对象不再需要后不应保留所生成访问器的情况。默认情况下，访问器会保留不变。
+
 =item B<DEFAULT>
 
 设置默认参数。当调用 C<has> 时，DEFAULT 参数会插入到显式参数之前。若两者都有同一参数，则以显式参数为准。带有 C<+> 的增量调用不受影响。
@@ -320,7 +324,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021-2025 Kazumasa Utashiro
+Copyright 2021-2026 Kazumasa Utashiro
 
 =head1 LICENSE
 

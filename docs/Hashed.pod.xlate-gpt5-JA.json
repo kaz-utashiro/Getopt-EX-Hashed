@@ -12,8 +12,8 @@
       "このモジュールの主目的は、初期化と仕様の定義を一箇所に統合することです。簡易な検証インターフェースも提供します。\n"
    ],
    [
-      "Accessor methods are automatically generated when C<is> parameter is given. If the same function is already defined, the program causes fatal error. Accessors are removed when the object is destroyed. Problems may occur when multiple objects are present at the same time.\n",
-      "C<is> パラメータが与えられるとアクセサメソッドが自動生成されます。同名の関数がすでに定義されている場合、プログラムは致命的エラーとなります。オブジェクトが破棄されるとアクセサは削除されます。同時に複数のオブジェクトが存在する場合、問題が発生する可能性があります。\n"
+      "Accessor methods are automatically generated when C<is> parameter is given. If the same function is already defined, the program causes fatal error. Accessors persist after the object is destroyed. If you want to remove them on destruction, set C<REMOVE_ACCESSOR> configuration parameter to true.\n",
+      "C<is> パラメータが与えられると、アクセサメソッドが自動的に生成されます。同じ関数がすでに定義されている場合、プログラムは致命的なエラーを引き起こします。オブジェクトが破棄された後もアクセサは残ります。破棄時にそれらを削除したい場合は、C<REMOVE_ACCESSOR> 構成パラメータを true に設定してください。\n"
    ],
    [
       "Declare option parameters in the following form. The parentheses are for clarity only and may be omitted.\n",
@@ -218,6 +218,10 @@
    [
       "If true, read-write accessors have the lvalue attribute. Set to zero if you don't like that behavior.\n",
       "真の場合、読み書きアクセサに lvalue 属性が付きます。その挙動が好みでない場合は 0 に設定してください。\n"
+   ],
+   [
+      "If true, accessor methods are removed from the package namespace when the object is destroyed. This is intended for cases where the module is embedded in an existing class and the generated accessors should not persist after the object is no longer needed. By default, accessors are left in place.\n",
+      "true の場合、オブジェクトが破棄されると、アクセサメソッドはパッケージの名前空間から削除されます。これは、モジュールが既存のクラスに埋め込まれており、生成されたアクセサを不要になった後に残さないようにしたい場合を想定しています。デフォルトでは、アクセサはそのまま残ります。\n"
    ],
    [
       "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before the explicit parameters. If a parameter appears in both, the explicit one takes precedence. Incremental calls with C<+> are not affected.\n",

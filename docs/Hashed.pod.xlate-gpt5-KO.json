@@ -12,8 +12,8 @@
       "이 모듈의 주요 목적은 초기화와 명세를 한 곳에 통합하는 것입니다. 또한 간단한 검증 인터페이스를 제공합니다.\n"
    ],
    [
-      "Accessor methods are automatically generated when C<is> parameter is given. If the same function is already defined, the program causes fatal error. Accessors are removed when the object is destroyed. Problems may occur when multiple objects are present at the same time.\n",
-      "C<is> 매개변수가 주어지면 접근자 메서드가 자동으로 생성됩니다. 동일한 함수가 이미 정의되어 있으면 프로그램은 치명적 오류를 발생시킵니다. 객체가 파괴될 때 접근자는 제거됩니다. 여러 객체가 동시에 존재할 때 문제를 일으킬 수 있습니다.\n"
+      "Accessor methods are automatically generated when C<is> parameter is given. If the same function is already defined, the program causes fatal error. Accessors persist after the object is destroyed. If you want to remove them on destruction, set C<REMOVE_ACCESSOR> configuration parameter to true.\n",
+      "C<is> 매개변수가 주어지면 접근자 메서드가 자동으로 생성됩니다. 동일한 함수가 이미 정의되어 있으면 프로그램은 치명적인 오류를 발생시킵니다. 객체가 파기된 후에도 접근자는 계속 남습니다. 파기 시에 이를 제거하고 싶다면 C<REMOVE_ACCESSOR> 구성 매개변수를 true로 설정하십시오.\n"
    ],
    [
       "Declare option parameters in the following form. The parentheses are for clarity only and may be omitted.\n",
@@ -218,6 +218,10 @@
    [
       "If true, read-write accessors have the lvalue attribute. Set to zero if you don't like that behavior.\n",
       "참이면, 읽기-쓰기 접근자는 lvalue 속성을 가집니다. 그러한 동작이 마음에 들지 않으면 0으로 설정하세요.\n"
+   ],
+   [
+      "If true, accessor methods are removed from the package namespace when the object is destroyed. This is intended for cases where the module is embedded in an existing class and the generated accessors should not persist after the object is no longer needed. By default, accessors are left in place.\n",
+      "true이면, 객체가 파기될 때 패키지 네임스페이스에서 접근자 메서드가 제거됩니다. 이는 모듈이 기존 클래스에 내장되어 있고, 더 이상 필요하지 않을 때 생성된 접근자가 남지 않도록 해야 하는 경우를 위한 것입니다. 기본적으로 접근자는 그대로 유지됩니다.\n"
    ],
    [
       "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before the explicit parameters. If a parameter appears in both, the explicit one takes precedence. Incremental calls with C<+> are not affected.\n",

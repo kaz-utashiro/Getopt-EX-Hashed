@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash object automation for Getopt::Long
 
 # VERSION
 
-Version 1.0602
+Version 1.07
 
 # SYNOPSIS
 
@@ -377,7 +377,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021-2025 Kazumasa Utashiro
+Copyright 2021-2026 Kazumasa Utashiro
 
 # LICENSE
 

@@ -4,7 +4,7 @@ Getopt::EX::Hashed - Getopt::Long을 위한 해시 객체 자동화
 
 # VERSION
 
-Version 1.0602
+Version 1.07
 
 # SYNOPSIS
 
@@ -40,7 +40,7 @@ Version 1.0602
 
 이 모듈의 주요 목적은 초기화와 명세를 한 곳에 통합하는 것입니다. 또한 간단한 검증 인터페이스를 제공합니다.
 
-`is` 매개변수가 주어지면 접근자 메서드가 자동으로 생성됩니다. 동일한 함수가 이미 정의되어 있으면 프로그램은 치명적 오류를 발생시킵니다. 객체가 파괴될 때 접근자는 제거됩니다. 여러 객체가 동시에 존재할 때 문제를 일으킬 수 있습니다.
+`is` 매개변수가 주어지면 접근자 메서드가 자동으로 생성됩니다. 동일한 함수가 이미 정의되어 있으면 프로그램은 치명적인 오류를 발생시킵니다. 객체가 파기된 후에도 접근자는 계속 남습니다. 파기 시에 이를 제거하고 싶다면 `REMOVE_ACCESSOR` 구성 매개변수를 true로 설정하십시오.
 
 # FUNCTION
 
@@ -260,6 +260,10 @@ LOCK\_KEYS가 활성화되면, 존재하지 않는 멤버에 접근할 경우 �
 
     참이면, 읽기-쓰기 접근자는 lvalue 속성을 가집니다. 그러한 동작이 마음에 들지 않으면 0으로 설정하세요.
 
+- **REMOVE\_ACCESSOR** (default: 0)
+
+    true이면, 객체가 파기될 때 패키지 네임스페이스에서 접근자 메서드가 제거됩니다. 이는 모듈이 기존 클래스에 내장되어 있고, 더 이상 필요하지 않을 때 생성된 접근자가 남지 않도록 해야 하는 경우를 위한 것입니다. 기본적으로 접근자는 그대로 유지됩니다.
+
 - **DEFAULT**
 
     기본 매개변수를 설정합니다. `has`가 호출될 때 DEFAULT 매개변수가 명시적 매개변수 앞에 삽입됩니다. 둘 모두에 매개변수가 나타나면, 명시적인 것이 우선합니다. `+`가 있는 누적 호출에는 영향을 주지 않습니다.
@@ -288,7 +292,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021-2025 Kazumasa Utashiro
+Copyright 2021-2026 Kazumasa Utashiro
 
 # LICENSE
 

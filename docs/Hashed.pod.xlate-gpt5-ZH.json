@@ -12,8 +12,8 @@
       "本模块的主要目标是将初始化与规范定义整合在同一处。它还提供了一个简单的校验接口。\n"
    ],
    [
-      "Accessor methods are automatically generated when C<is> parameter is given. If the same function is already defined, the program causes fatal error. Accessors are removed when the object is destroyed. Problems may occur when multiple objects are present at the same time.\n",
-      "当提供 C<is> 参数时，会自动生成访问器方法。如果同名函数已存在，程序将发生致命错误。对象销毁时，访问器将被移除。当同时存在多个对象时可能出现问题。\n"
+      "Accessor methods are automatically generated when C<is> parameter is given. If the same function is already defined, the program causes fatal error. Accessors persist after the object is destroyed. If you want to remove them on destruction, set C<REMOVE_ACCESSOR> configuration parameter to true.\n",
+      "当提供 C<is> 参数时，会自动生成访问器方法。如果同名函数已被定义，程序将导致致命错误。对象被销毁后，访问器仍会保留。若希望在销毁时移除它们，请将配置参数 C<REMOVE_ACCESSOR> 设为 true。\n"
    ],
    [
       "Declare option parameters in the following form. The parentheses are for clarity only and may be omitted.\n",
@@ -218,6 +218,10 @@
    [
       "If true, read-write accessors have the lvalue attribute. Set to zero if you don't like that behavior.\n",
       "如果为真，读写访问器具有 lvalue 属性。如果你不喜欢这种行为，请设为零。\n"
+   ],
+   [
+      "If true, accessor methods are removed from the package namespace when the object is destroyed. This is intended for cases where the module is embedded in an existing class and the generated accessors should not persist after the object is no longer needed. By default, accessors are left in place.\n",
+      "若为 true，当对象被销毁时，将从包命名空间中移除访问器方法。此选项适用于模块嵌入到已有类且在对象不再需要后不应保留所生成访问器的情况。默认情况下，访问器会保留不变。\n"
    ],
    [
       "Set default parameters. When C<has> is called, DEFAULT parameters are inserted before the explicit parameters. If a parameter appears in both, the explicit one takes precedence. Incremental calls with C<+> are not affected.\n",
