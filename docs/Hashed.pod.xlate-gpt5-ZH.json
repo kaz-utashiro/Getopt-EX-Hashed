@@ -108,8 +108,8 @@
       "设置默认值。如果未提供默认值，成员将初始化为 C<undef>。\n"
    ],
    [
-      "If the value is a reference to an ARRAY or HASH, a shallow copy is created for each C<new> call. This means the reference itself is copied, but the contents are shared. Modifying the array or hash contents will affect all instances.\n",
-      "如果该值是对 ARRAY 或 HASH 的引用，则每次调用 C<new> 都会创建一个浅拷贝。这意味着复制的是引用本身，但其内容是共享的。修改数组或哈希的内容将影响所有实例。\n"
+      "If the value is a reference to an ARRAY or HASH, a shallow copy is created for each C<new> call. The elements are not deep-copied, so if any element is itself a reference, the referenced data is shared across instances.\n",
+      "如果该值是对 ARRAY 或 HASH 的引用，则每次调用 C<new> 都会创建一个浅拷贝。元素不会被深拷贝，因此如果任何元素本身是引用，被引用的数据将在各个实例之间共享。\n"
    ],
    [
       "If a code reference is given, it is called at the time of B<new> to get default value. This is effective when you want to evaluate the value at the time of execution, rather than declaration. If you want to define a default action, use the B<action> parameter. If you want to set code reference as the initial value, you must specify a code reference that returns a code reference.\n",

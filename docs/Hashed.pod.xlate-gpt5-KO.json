@@ -108,8 +108,8 @@
       "기본값을 설정합니다. 기본값이 주어지지 않으면 멤버는 C<undef>로 초기화됩니다.\n"
    ],
    [
-      "If the value is a reference to an ARRAY or HASH, a shallow copy is created for each C<new> call. This means the reference itself is copied, but the contents are shared. Modifying the array or hash contents will affect all instances.\n",
-      "값이 ARRAY 또는 HASH에 대한 참조인 경우, 각 C<new> 호출마다 얕은 복사본이 생성됩니다. 이는 참조 자체는 복사되지만, 내용은 공유된다는 뜻입니다. 배열이나 해시의 내용을 수정하면 모든 인스턴스에 영향을 미칩니다.\n"
+      "If the value is a reference to an ARRAY or HASH, a shallow copy is created for each C<new> call. The elements are not deep-copied, so if any element is itself a reference, the referenced data is shared across instances.\n",
+      "값이 ARRAY나 HASH에 대한 참조라면, 각 C<new> 호출마다 얕은 복사본이 생성됩니다. 요소들은 깊은 복사가 이루어지지 않으므로, 어떤 요소가 자체적으로 참조라면 해당 참조가 가리키는 데이터는 인스턴스들 간에 공유됩니다.\n"
    ],
    [
       "If a code reference is given, it is called at the time of B<new> to get default value. This is effective when you want to evaluate the value at the time of execution, rather than declaration. If you want to define a default action, use the B<action> parameter. If you want to set code reference as the initial value, you must specify a code reference that returns a code reference.\n",

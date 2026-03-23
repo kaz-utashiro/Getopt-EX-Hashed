@@ -108,8 +108,8 @@
       "デフォルト値を設定します。デフォルトが与えられない場合、メンバーは C<undef> として初期化されます。\n"
    ],
    [
-      "If the value is a reference to an ARRAY or HASH, a shallow copy is created for each C<new> call. This means the reference itself is copied, but the contents are shared. Modifying the array or hash contents will affect all instances.\n",
-      "値が ARRAY または HASH へのリファレンスである場合、各 C<new> 呼び出しで浅いコピーが作成されます。これは、リファレンス自体はコピーされますが、内容は共有されることを意味します。配列やハッシュの内容を変更すると、すべてのインスタンスに影響します。\n"
+      "If the value is a reference to an ARRAY or HASH, a shallow copy is created for each C<new> call. The elements are not deep-copied, so if any element is itself a reference, the referenced data is shared across instances.\n",
+      "値が ARRAY または HASH へのリファレンスである場合、各 C<new> 呼び出しごとに浅いコピーが作成されます。要素はディープコピーされないため、要素自体がリファレンスである場合、その参照先データはインスタンス間で共有されます。\n"
    ],
    [
       "If a code reference is given, it is called at the time of B<new> to get default value. This is effective when you want to evaluate the value at the time of execution, rather than declaration. If you want to define a default action, use the B<action> parameter. If you want to set code reference as the initial value, you must specify a code reference that returns a code reference.\n",
