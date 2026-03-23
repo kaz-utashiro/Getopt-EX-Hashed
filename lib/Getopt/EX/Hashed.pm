@@ -383,7 +383,7 @@ sub _opt_dest {
     else {
 	if (ref $obj->{$name} eq 'CODE') {
 	    sub { &{$obj->{$name}} for $obj };
-	} elsif (ref $obj->{$name} eq 'SCALAR') {
+	} elsif (ref $obj->{$name}) {
 	    $obj->{$name};
 	} else {
 	    \$obj->{$name};
