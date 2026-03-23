@@ -608,9 +608,9 @@ Set default value.  If no default is given, the member is initialized
 as C<undef>.
 
 If the value is a reference to an ARRAY or HASH, a shallow copy is
-created for each C<new> call.  This means the reference itself is
-copied, but the contents are shared.  Modifying the array or hash
-contents will affect all instances.
+created for each C<new> call.  The elements are shared, so modifying
+referenced data (e.g., pushing to a nested array) will affect all
+instances.  Replacing an element itself only affects that instance.
 
 If a code reference is given, it is called at the time of B<new> to
 get default value.  This is effective when you want to evaluate the
